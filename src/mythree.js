@@ -3,7 +3,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {adjustLight} from "./space/light";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
-import {WebGLBackground as effect} from "three/src/renderers/webgl/WebGLBackground";
+import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 
 let camera, scene, renderer;
 const clock = new THREE.Clock();
@@ -64,7 +64,8 @@ function init() {
   };
 
   const gltfLoader = new GLTFLoader(manager);
-  const dracoLoader = new DRACOLoader();
+  const dracoLoader = new DRACOLoader(manager);
+  const fbxLoader = new FBXLoader(manager)
   dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
   gltfLoader.setDRACOLoader(dracoLoader);
 
@@ -98,20 +99,23 @@ function init() {
   // Luci
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
   const dirLight = new THREE.DirectionalLight(0xffffff);
-  adjustLight(hemiLight, dirLight, scene)
+  adjustLight(hemiLight, dirLight, scene);
 
   // Recruiter
   recruiter = new THREE.Scene();
-  gltfLoader.load('models/yueyong/scene.gltf', function (object) {
-    // recruiterMixer = new THREE.AnimationMixer( object );
-    // recruiterAction = recruiterMixer.clipAction( object.animations[ 0 ] );
-    // recruiterAction.play()
-    // recruiterAction.timeScale = 0;
-    object.scene.position.set(-300,0,0);
-    object.scene.rotateY(4.8)
-    object.scene.scale.set(2,2,2)
+  fbxLoader.load('models/recruiter/recruiter.fbx',  (fbx) => {
 
-    recruiter.add(object.scene);
+    fbx.position.set(-290,0,50);
+    fbx.scale.setScalar(2);
+    fbx.traverse(c=> {
+      c.castShadow = true;
+    })
+
+    fbxLoader.load('models/recruiter/Angry.fbx', (anim) => {
+      recruiterMixer = new THREE.AnimationMixer(fbx);
+      recruiterMixer.clipAction(anim.animations[0]).play();
+    })
+    recruiter.add( fbx );
   });
   scene.add(recruiter);
 
@@ -127,17 +131,19 @@ function init() {
 
   // developer
   developer = new THREE.Scene();
-  gltfLoader.load('models/yueyong/scene.gltf', function (object) {
-    // developerMixer = new THREE.AnimationMixer( object );
-    // developerAction = developerMixer.clipAction( object.animations[ 0 ] );
-    // developerAction.play()
-    // developerAction.timeScale = 0;
-    // object.position.set(430,0,0)
-    // object.scale.set(2,2,2)
-    object.scene.position.set(290,0,0);
-    object.scene.rotateY(4.7)
-    object.scene.scale.set(2,2,2)
-    developer.add(object.scene);
+  fbxLoader.load('models/developer/ExportedRobot.fbx',  (fbx) => {
+
+    fbx.position.set(290,0,50);
+    fbx.scale.setScalar(1);
+    fbx.traverse(c=> {
+      c.castShadow = true;
+    })
+
+    fbxLoader.load('models/developer/Offensive_Idle.fbx', (anim) => {
+      developerMixer = new THREE.AnimationMixer(fbx);
+      developerMixer.clipAction(anim.animations[0]).play();
+    })
+    developer.add( fbx );
   });
   scene.add(developer);
 
@@ -256,13 +262,10 @@ function onDocumentMouseMove(event) {
 
 }
 function render() {
-
   camera.position.x += (mouseX - camera.position.x) * .01;
   // camera.position.y += (mouseY - camera.position.y) * .01;
-
   camera.lookAt(scene.position.x,scene.position.y+225,scene.position.z);
 
-  effect.render(scene, camera);
 
 }
 
