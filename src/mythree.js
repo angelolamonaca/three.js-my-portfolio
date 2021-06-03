@@ -4,12 +4,21 @@ import {adjustLight} from "./space/light";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
+import {follow} from "./follow";
 
 let camera, scene, renderer;
 const clock = new THREE.Clock();
-let recruiter, recruiterIsPlaying = false, recruiterAction, recruiterMixer, recruiterHover = false;
-let developer, developerIsPlaying = false, developerAction, developerMixer, developerHover = false;
+let recruiter, recruiterMixer, recruiterHover = false;
+let developer, developerMixer, developerHover = false;
 let ambiente;
+
+let keys = {
+  a: false,
+  s: false,
+  d: false,
+  w: false
+};
+let activePlayer;
 
 let recruiterText, developerText, friendText, whoareyou;
 let raycaster = new THREE.Raycaster();
@@ -20,11 +29,9 @@ const textColor = new THREE.MeshBasicMaterial({
   color: new THREE.Color("white"),
   side: THREE.DoubleSide
 });
-let mouseX = 0;
-let mouseY = 0;
 
+let mouseX = 0;
 let windowHalfX = window.innerWidth / 2;
-let windowHalfY = window.innerHeight / 2;
 
 
 init();
@@ -103,15 +110,15 @@ function init() {
 
   // Recruiter
   recruiter = new THREE.Scene();
-  fbxLoader.load('models/recruiter/recruiter.fbx',  (fbx) => {
+  fbxLoader.load('models/recruiter/Robot.fbx',  (fbx) => {
 
     fbx.position.set(-290,0,50);
-    fbx.scale.setScalar(2);
+    fbx.scale.setScalar(1.2);
     fbx.traverse(c=> {
       c.castShadow = true;
     })
 
-    fbxLoader.load('models/recruiter/Angry.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/Offensive_Idle.fbx', (anim) => {
       recruiterMixer = new THREE.AnimationMixer(fbx);
       recruiterMixer.clipAction(anim.animations[0]).play();
     })
@@ -131,15 +138,15 @@ function init() {
 
   // developer
   developer = new THREE.Scene();
-  fbxLoader.load('models/developer/ExportedRobot.fbx',  (fbx) => {
+  fbxLoader.load('models/developer/Robot.fbx',  (fbx) => {
 
     fbx.position.set(290,0,50);
-    fbx.scale.setScalar(1);
+    fbx.scale.setScalar(3);
     fbx.traverse(c=> {
       c.castShadow = true;
     })
 
-    fbxLoader.load('models/developer/Offensive_Idle.fbx', (anim) => {
+    fbxLoader.load('models/developer/Warrior_Idle.fbx', (anim) => {
       developerMixer = new THREE.AnimationMixer(fbx);
       developerMixer.clipAction(anim.animations[0]).play();
     })
@@ -171,10 +178,23 @@ function init() {
   // controls.update();
 
   // EventListeners
-  window.addEventListener('resize', onWindowResize);
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
   document.addEventListener('mousemove', onDocumentMouseMove);
+  document.body.addEventListener( 'keydown', function(e) {
+
+    const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = true;
+
+  });
+  document.body.addEventListener( 'keyup', function(e) {
+
+    const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = false;
+
+  });
 
 }
 
@@ -195,21 +215,22 @@ function onMouseClick(event) {
   const recruiterIntersects = raycaster.intersectObjects(recruiter.children, true);
   const developerIntersects = raycaster.intersectObjects(developer.children, true);
 
-  startAnimation(recruiterIsPlaying, recruiterIntersects, recruiterAction, 3800)
-  startAnimation(developerIsPlaying, developerIntersects, developerAction, 1800)
+  if (recruiterIntersects.length>0) {
+    console.log('hai cliccato su recruiter')
+    removeEventsListener()
+    follow(recruiter, camera)
+    activePlayer = recruiter;
+  } else if (developerIntersects.length>0) {
+    console.log('hai cliccato su developer')
+    removeEventsListener()
+    follow(developer, camera)
+    activePlayer = developer;
+  }
 
-  function startAnimation(someoneIsPlaying, someoneIntersects, someoneAction, someoneTimeout) {
-    if (someoneIsPlaying === false && someoneIntersects.length > 0) {
-      someoneIsPlaying = true;
-      someoneAction.timeScale = 1;
-      setTimeout(function () {
-        someoneAction.stop();
-        someoneAction.play();
-        someoneAction.timeScale = 0;
-        someoneIsPlaying = false;
-        window.location.href = 'home/index.html';
-      }, someoneTimeout);
-    }
+  function removeEventsListener() {
+    document.removeEventListener('click', onMouseClick, false);
+    document.removeEventListener('mousemove', onMouseMove, false);
+    document.removeEventListener('mousemove', onDocumentMouseMove);
   }
 }
 
@@ -237,13 +258,6 @@ function onMouseMove(event) {
   }
 }
 
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-}
-
 function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
@@ -252,6 +266,22 @@ function animate() {
   if (developerMixer) developerMixer.update(delta);
   renderer.render(scene, camera);
 
+  if ( keys.w ) {
+    console.log('Pressed w')
+    activePlayer.translateZ(2)
+  }
+  else if ( keys.s ) {
+    console.log('Pressed s')
+    activePlayer.translateZ(-2)
+  }
+  if ( keys.a ) {
+    console.log('Pressed a')
+    activePlayer.rotateY(0.05);
+  }
+  else if ( keys.d ) {
+    console.log('Pressed d')
+    activePlayer.rotateY(-0.05);
+  }
   render();
 }
 
@@ -263,8 +293,8 @@ function onDocumentMouseMove(event) {
 }
 function render() {
   camera.position.x += (mouseX - camera.position.x) * .01;
-  // camera.position.y += (mouseY - camera.position.y) * .01;
-  camera.lookAt(scene.position.x,scene.position.y+225,scene.position.z);
+   //camera.position.y += (mouseY - camera.position.y) * .01;
+  //camera.lookAt(scene.position.x,scene.position.y+225,scene.position.z);
 
 
 }
