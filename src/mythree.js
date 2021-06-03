@@ -276,11 +276,11 @@ function animate() {
   }
   if ( keys.a ) {
     console.log('Pressed a')
-    activePlayer.rotateY(0.05);
+    activePlayer.children[0].rotateY(0.05);
   }
   else if ( keys.d ) {
     console.log('Pressed d')
-    activePlayer.rotateY(-0.05);
+    activePlayer.children[0].rotateY(-0.05);
   }
   render();
 }
