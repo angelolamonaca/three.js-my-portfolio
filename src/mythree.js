@@ -1,16 +1,20 @@
 import * as THREE from 'three';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {adjustLight} from "./space/light";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
+import {Vector3} from "three";
 
 let camera, scene, renderer;
 const clock = new THREE.Clock();
-let recruiter, recruiterMixer, recruiterHover = false;
-let developer, developerMixer, developerHover = false;
+let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft, recruiterWalkRight, recruiterHover = false;
+let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft, developerWalkRight, developerHover = false;
+let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft, activePlayerWalkRight;
 let ambiente;
+
+let signed;
+let frontVector = new Vector3();
 
 let keys = {
   a: false,
@@ -18,7 +22,6 @@ let keys = {
   d: false,
   w: false
 };
-let activePlayer;
 
 let recruiterText, developerText, friendText, whoareyou;
 let raycaster = new THREE.Raycaster();
@@ -89,15 +92,14 @@ function init() {
   scene.add(whoareyou);
 
 
-
   ambiente = new THREE.Scene();
   gltfLoader.load('models/cyberpunk-office/source/CyberpunkOffice.glb', function (object) {
     // recruiterMixer = new THREE.AnimationMixer( object );
     // recruiterAction = recruiterMixer.clipAction( object.animations[ 0 ] );
     // recruiterAction.play()
     // recruiterAction.timeScale = 0;
-    object.scene.position.set(0,0,0);
-    object.scene.scale.set(100,100,100)
+    object.scene.position.set(0, 0, 0);
+    object.scene.scale.set(100, 100, 100)
 
     ambiente.add(object.scene);
   });
@@ -110,19 +112,39 @@ function init() {
 
   // Recruiter
   recruiter = new THREE.Scene();
-  fbxLoader.load('models/recruiter/Robot.fbx',  (fbx) => {
+  fbxLoader.load('models/recruiter/Robot.fbx', (fbx) => {
 
-    fbx.position.set(-290,0,50);
+    fbx.position.set(-290, 0, 50);
     fbx.scale.setScalar(1.2);
-    fbx.traverse(c=> {
+    fbx.traverse(c => {
       c.castShadow = true;
     })
 
+    recruiterMixer = new THREE.AnimationMixer(fbx);
     fbxLoader.load('models/recruiter/Offensive_Idle.fbx', (anim) => {
-      recruiterMixer = new THREE.AnimationMixer(fbx);
-      recruiterMixer.clipAction(anim.animations[0]).play();
+      recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
     })
-    recruiter.add( fbx );
+    recruiter.add(fbx);
+
+    fbxLoader.load('models/recruiter/Dwarf_Walk.fbx', (anim) => {
+      recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
+    })
+    recruiter.add(fbx);
+
+    fbxLoader.load('models/recruiter/Walking_Backward.fbx', (anim) => {
+      recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
+    })
+    recruiter.add(fbx);
+
+    fbxLoader.load('models/recruiter/Walk_Strafe_Left.fbx', (anim) => {
+      recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
+    })
+    recruiter.add(fbx);
+
+    fbxLoader.load('models/recruiter/Walk_Strafe_Right.fbx', (anim) => {
+      recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
+    })
+    recruiter.add(fbx);
   });
   scene.add(recruiter);
 
@@ -138,19 +160,40 @@ function init() {
 
   // developer
   developer = new THREE.Scene();
-  fbxLoader.load('models/developer/Robot.fbx',  (fbx) => {
+  fbxLoader.load('models/developer/Robot.fbx', (fbx) => {
 
-    fbx.position.set(290,0,50);
+    fbx.position.set(290, 0, 50);
     fbx.scale.setScalar(3);
-    fbx.traverse(c=> {
+    fbx.traverse(c => {
       c.castShadow = true;
     })
 
+    developerMixer = new THREE.AnimationMixer(fbx);
     fbxLoader.load('models/developer/Warrior_Idle.fbx', (anim) => {
-      developerMixer = new THREE.AnimationMixer(fbx);
-      developerMixer.clipAction(anim.animations[0]).play();
+      developerIdle = developerMixer.clipAction(anim.animations[0])
+      developerIdle.play()
     })
-    developer.add( fbx );
+    developer.add(fbx);
+
+    fbxLoader.load('models/developer/Dwarf_Walk.fbx', (anim) => {
+      developerWalk = developerMixer.clipAction(anim.animations[0]);
+    })
+    developer.add(fbx);
+
+    fbxLoader.load('models/developer/Walking_Backward.fbx', (anim) => {
+      developerWalkBackwards = developerMixer.clipAction(anim.animations[0]);
+    })
+    developer.add(fbx);
+
+    fbxLoader.load('models/developer/Walk_Strafe_Left.fbx', (anim) => {
+      developerWalkLeft = developerMixer.clipAction(anim.animations[0]);
+    })
+    developer.add(fbx);
+
+    fbxLoader.load('models/developer/Walk_Strafe_Right.fbx', (anim) => {
+      developerWalkRight = developerMixer.clipAction(anim.animations[0]);
+    })
+    developer.add(fbx);
   });
   scene.add(developer);
 
@@ -181,18 +224,15 @@ function init() {
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
   document.addEventListener('mousemove', onDocumentMouseMove);
-  document.body.addEventListener( 'keydown', function(e) {
-
+  document.body.addEventListener('keydown', function (e) {
     const key = e.code.replace('Key', '').toLowerCase();
-    if ( keys[ key ] !== undefined )
-      keys[ key ] = true;
-
+    if (keys[key] !== undefined)
+      keys[key] = true;
   });
-  document.body.addEventListener( 'keyup', function(e) {
-
+  document.body.addEventListener('keyup', function (e) {
     const key = e.code.replace('Key', '').toLowerCase();
-    if ( keys[ key ] !== undefined )
-      keys[ key ] = false;
+    if (keys[key] !== undefined)
+      keys[key] = false;
 
   });
 
@@ -215,16 +255,28 @@ function onMouseClick(event) {
   const recruiterIntersects = raycaster.intersectObjects(recruiter.children, true);
   const developerIntersects = raycaster.intersectObjects(developer.children, true);
 
-  if (recruiterIntersects.length>0) {
+  if (recruiterIntersects.length > 0) {
     console.log('hai cliccato su recruiter')
     removeEventsListener()
     follow(recruiter, camera)
     activePlayer = recruiter;
-  } else if (developerIntersects.length>0) {
+    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
+    activePlayerIdle = recruiterIdle;
+    activePlayerWalk = recruiterWalk;
+    activePlayerWalkBackwards = recruiterWalkBackwards;
+    activePlayerWalkLeft = recruiterWalkLeft;
+    activePlayerWalkRight = recruiterWalkRight;
+  } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer')
     removeEventsListener()
     follow(developer, camera)
     activePlayer = developer;
+    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
+    activePlayerIdle = developerIdle;
+    activePlayerWalk = developerWalk;
+    activePlayerWalkBackwards = developerWalkBackwards;
+    activePlayerWalkLeft = developerWalkLeft;
+    activePlayerWalkRight = developerWalkRight;
   }
 
   function removeEventsListener() {
@@ -262,39 +314,71 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
   if (recruiterMixer) recruiterMixer.update(delta);
-  renderer.render(scene, camera);
   if (developerMixer) developerMixer.update(delta);
-  renderer.render(scene, camera);
+  if (activePlayer) {
+    activePlayer.children[0].lookAt(frontVector)
+    if (keys.w) {
+      console.log('Pressed w')
+      signed=true
+      frontVector.z+=1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
+      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      activePlayerWalk.play()
+      activePlayerIdle.stop()
+    } else if (!keys.w && activePlayerWalk) {
+      activePlayerIdle.play()
+      activePlayerWalk.stop()
+    }
+    if (keys.s) {
+      console.log('Pressed s')
+      frontVector.z-=1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
+      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      activePlayerWalkBackwards.play()
+      activePlayerIdle.stop()
+    } else if (!keys.s && activePlayerWalkBackwards) {
+      activePlayerIdle.play()
+      activePlayerWalkBackwards.stop()
+    }
+    if (keys.a) {
+      console.log('Pressed a')
+      frontVector.x+=1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
+      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      activePlayerWalkLeft.play()
+      activePlayerIdle.stop()
+    } else if (!keys.a && activePlayerWalkLeft) {
+      activePlayerIdle.play()
+      activePlayerWalkLeft.stop()
+    }
+    if (keys.d) {
+      console.log('Pressed d')
+      frontVector.x-=1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
+      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      activePlayerWalkRight.play()
+      activePlayerIdle.stop()
+    } else if (!keys.d && activePlayerWalkRight) {
+      activePlayerIdle.play()
+      activePlayerWalkRight.stop()
+    }
+    if (activePlayer && signed) {
+      // camera.lookAt(frontVector.x, frontVector.y+225, frontVector.z)
+    }
+  }
 
-  if ( keys.w ) {
-    console.log('Pressed w')
-    activePlayer.translateZ(2)
-  }
-  else if ( keys.s ) {
-    console.log('Pressed s')
-    activePlayer.translateZ(-2)
-  }
-  if ( keys.a ) {
-    console.log('Pressed a')
-    activePlayer.children[0].rotateY(0.05);
-  }
-  else if ( keys.d ) {
-    console.log('Pressed d')
-    activePlayer.children[0].rotateY(-0.05);
-  }
   render();
 }
 
 function onDocumentMouseMove(event) {
-
   mouseX = (event.clientX - windowHalfX) / 2;
-  // mouseY = (event.clientY - windowHalfY) / 100;
-
 }
+
 function render() {
+  renderer.render(scene, camera);
+
+  if (!signed)
   camera.position.x += (mouseX - camera.position.x) * .01;
-   //camera.position.y += (mouseY - camera.position.y) * .01;
-  //camera.lookAt(scene.position.x,scene.position.y+225,scene.position.z);
 
 
 }
