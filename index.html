@@ -7,16 +7,44 @@
 </head>
 <body>
 <span class="text" id="wyn" hidden>what's your name?</span>
-<form id="myForm">
-  <span id="inpR" hidden><input type="text" placeholder="YOUR NAME"/><img src="src/img/ok.png">ok</img></span>
-  <span id="inpD" hidden><input type="text" placeholder="YOUR NAME"/><img src="src/img/ok.png">ok</img></span>
-  <input type="submit" onclick="signed=true" hidden/>
-</form>
-<script src="src/mythree.js"></script>
-<script>
-  var form = document.getElementById("myForm");
-  function handleForm(event) { event.preventDefault(); }
-  form.addEventListener('submit', handleForm);
-</script>
+
+<div class="textbox" id="inpD" hidden>
+  <div class="textbox-box">
+    <div class="textbox-face textbox-side"></div>
+    <div class="textbox-face textbox-bottom"></div>
+    <div class="textbox-face textbox-top"></div>
+    <div class="textbox-field">
+      <input class="textbox-text" id="inpDname" type="text" placeholder="TYPE HERE..."/>
+    </div>
+    <div class="textbox-action" id="signInDbutton">
+      <div class="textbox-face textbox-side"></div>
+      <div class="textbox-face textbox-top"></div>
+      <div class="textbox-face textbox-bottom"></div>
+      <svg viewBox="0 0 24 24">
+        <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+      </svg>
+    </div>
+  </div>
+</div><a class="reference" href="https://rgb.wiki/textbox" target="_blank"><img src="https://rgb.wiki/favicon.png"/></a>
+
+<div class="textbox" id="inpR" hidden>
+  <div class="textbox-box">
+    <div class="textbox-face textbox-side"></div>
+    <div class="textbox-face textbox-bottom"></div>
+    <div class="textbox-face textbox-top"></div>
+    <div class="textbox-field">
+      <input class="textbox-text" id="inpRname" type="text" placeholder="TYPE HERE..."/>
+    </div>
+    <div class="textbox-action" id="signInRbutton">
+      <div class="textbox-face textbox-side"></div>
+      <div class="textbox-face textbox-top"></div>
+      <div class="textbox-face textbox-bottom"></div>
+      <svg viewBox="0 0 24 24">
+        <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+      </svg>
+    </div>
+  </div>
+</div><a class="reference" href="https://rgb.wiki/textbox" target="_blank"><img src="https://rgb.wiki/favicon.png"/></a>
+<script type="text/javascript" src="./src/mythree.js"></script>
 </body>
 </html>

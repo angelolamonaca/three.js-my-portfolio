@@ -45708,6 +45708,7 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+var wyn = document.getElementById('wyn');
 var inpR = document.getElementById('inpR');
 var inpD = document.getElementById('inpD');
 var camera, scene, renderer;
@@ -45903,6 +45904,8 @@ function init() {
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
   document.addEventListener('mousemove', onDocumentMouseMove);
+  document.getElementById("signInDbutton").addEventListener("click", signin, false);
+  document.getElementById("signInRbutton").addEventListener("click", signin, false);
   document.body.addEventListener('keydown', function (e) {
     var key = e.code.replace('Key', '').toLowerCase();
     if (keys[key] !== undefined) keys[key] = true;
@@ -45949,7 +45952,7 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer');
     removeEventsListener();
-    document.getElementById('wyn').hidden = false;
+    wyn.hidden = false;
     inpD.hidden = false;
     recruiter.visible = false;
     recruiterText.visible = false;
@@ -46005,7 +46008,6 @@ function animate() {
     activePlayer.children[0].lookAt(frontVector);
 
     if (keys.w) {
-      console.log('Pressed w');
       frontVector.z += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46017,7 +46019,6 @@ function animate() {
     }
 
     if (keys.s) {
-      console.log('Pressed s');
       frontVector.z -= 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46029,7 +46030,6 @@ function animate() {
     }
 
     if (keys.a) {
-      console.log('Pressed a');
       frontVector.x += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46041,7 +46041,6 @@ function animate() {
     }
 
     if (keys.d) {
-      console.log('Pressed d');
       frontVector.x -= 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46070,6 +46069,18 @@ function render() {
 
 function onTransitionEnd(event) {
   event.target.remove();
+}
+
+function signin() {
+  console.log(document.getElementById('inpDname').value);
+  console.log(document.getElementById('inpRname').value);
+  wyn.hidden = true;
+  inpR.hidden = true;
+  inpD.hidden = true;
+  signed = true;
+  frontVector.z += 1;
+  activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
+  camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
 }
 },{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];

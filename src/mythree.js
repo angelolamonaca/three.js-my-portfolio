@@ -6,13 +6,17 @@ import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
 import {Vector3} from "three";
 
-let inpR =document.getElementById('inpR');
-let inpD =document.getElementById('inpD');
+let wyn = document.getElementById('wyn');
+let inpR = document.getElementById('inpR');
+let inpD = document.getElementById('inpD');
 let camera, scene, renderer;
 const clock = new THREE.Clock();
-let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft, recruiterWalkRight, recruiterHover = false;
-let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft, developerWalkRight, developerHover = false;
-let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft, activePlayerWalkRight;
+let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft,
+  recruiterWalkRight, recruiterHover = false;
+let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft,
+  developerWalkRight, developerHover = false;
+let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft,
+  activePlayerWalkRight;
 let ambiente;
 
 let signed;
@@ -216,6 +220,8 @@ function init() {
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
   document.addEventListener('mousemove', onDocumentMouseMove);
+  document.getElementById("signInDbutton").addEventListener("click", signin, false);
+  document.getElementById("signInRbutton").addEventListener("click", signin, false);
   document.body.addEventListener('keydown', function (e) {
     const key = e.code.replace('Key', '').toLowerCase();
     if (keys[key] !== undefined)
@@ -250,15 +256,15 @@ function onMouseClick(event) {
   if (recruiterIntersects.length > 0) {
     console.log('hai cliccato su recruiter')
     removeEventsListener()
-    document.getElementById('wyn').hidden=false;
-    inpR.hidden=false;
+    document.getElementById('wyn').hidden = false;
+    inpR.hidden = false;
     developer.visible = false;
-    recruiterText.visible=false;
+    recruiterText.visible = false;
     developerText.visible = false;
     whoareyou.visible = false;
     follow(recruiter, camera)
     activePlayer = recruiter;
-    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
+    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z + 100)
     activePlayerIdle = recruiterIdle;
     activePlayerWalk = recruiterWalk;
     activePlayerWalkBackwards = recruiterWalkBackwards;
@@ -267,15 +273,15 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer')
     removeEventsListener()
-    document.getElementById('wyn').hidden=false;
-    inpD.hidden=false;
-    recruiter.visible=false;
-    recruiterText.visible=false;
+    wyn.hidden = false;
+    inpD.hidden = false;
+    recruiter.visible = false;
+    recruiterText.visible = false;
     developerText.visible = false;
     whoareyou.visible = false;
     follow(developer, camera)
     activePlayer = developer;
-    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
+    frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z + 100)
     activePlayerIdle = developerIdle;
     activePlayerWalk = developerWalk;
     activePlayerWalkBackwards = developerWalkBackwards;
@@ -322,10 +328,9 @@ function animate() {
   if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector)
     if (keys.w) {
-      console.log('Pressed w')
-      frontVector.z+=1
-      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
-      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      frontVector.z += 1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
+      camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
       activePlayerWalk.play()
       activePlayerIdle.stop()
     } else if (!keys.w && activePlayerWalk) {
@@ -333,10 +338,9 @@ function animate() {
       activePlayerWalk.stop()
     }
     if (keys.s) {
-      console.log('Pressed s')
-      frontVector.z-=1
-      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
-      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      frontVector.z -= 1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
+      camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
       activePlayerWalkBackwards.play()
       activePlayerIdle.stop()
     } else if (!keys.s && activePlayerWalkBackwards) {
@@ -344,10 +348,9 @@ function animate() {
       activePlayerWalkBackwards.stop()
     }
     if (keys.a) {
-      console.log('Pressed a')
-      frontVector.x+=1
-      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
-      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      frontVector.x += 1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
+      camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
       activePlayerWalkLeft.play()
       activePlayerIdle.stop()
     } else if (!keys.a && activePlayerWalkLeft) {
@@ -355,10 +358,9 @@ function animate() {
       activePlayerWalkLeft.stop()
     }
     if (keys.d) {
-      console.log('Pressed d')
-      frontVector.x-=1
-      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
-      camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
+      frontVector.x -= 1
+      activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
+      camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
       activePlayerWalkRight.play()
       activePlayerIdle.stop()
     } else if (!keys.d && activePlayerWalkRight) {
@@ -381,7 +383,7 @@ function render() {
   renderer.render(scene, camera);
 
   if (!signed)
-  camera.position.x += (mouseX - camera.position.x) * .01;
+    camera.position.x += (mouseX - camera.position.x) * .01;
 
 
 }
@@ -390,4 +392,16 @@ function onTransitionEnd(event) {
 
   event.target.remove();
 
+}
+
+function signin() {
+  console.log(document.getElementById('inpDname').value)
+  console.log(document.getElementById('inpRname').value)
+  wyn.hidden=true;
+  inpR.hidden=true;
+  inpD.hidden=true;
+  signed=true;
+  frontVector.z += 1
+  activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
+  camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
 }

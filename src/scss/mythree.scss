@@ -29,39 +29,200 @@ body {
   1px 30px 60px rgba(16,16,16,0.4);
 }
 
-span#inpR {
-  position: absolute;
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+.textbox#inpD {
   top: 50vh;
-  left: 10vw;
-  & input {
-    font-size: 3em;
-    background-color: rgba(0,0,0,0.1);
-    color: whitesmoke;
-    display: inline-block;
-    vertical-align: middle;
+  right: 50vh;
+  width: 500px;
+  height: 110px;
+  position: absolute;
+  transform-style: preserve-3d;
+  -webkit-animation: turnaround 20s infinite;
+  animation: turnaround 20s infinite;
+}
+
+.textbox#inpR {
+  top: 50vh;
+  left: 60vh;
+  width: 500px;
+  height: 110px;
+  position: absolute;
+  transform-style: preserve-3d;
+  -webkit-animation: turnaround 20s infinite;
+  animation: turnaround 20s infinite;
+}
+.textbox-box {
+  background-color: whitesmoke;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 3px #6e3495;
+  position: relative;
+  -webkit-animation: hover 2s alternate infinite;
+  animation: hover 2s alternate infinite;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: all 0.2s ease;
+}
+.textbox-field {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px 15px;
+  align-self: stretch;
+  border-radius: 5px;
+}
+.textbox-action {
+  height: 80px;
+  width: 80px;
+  min-width: 80px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -border-radius: 100px;
+  transform-style: preserve-3d;
+  -webkit-animation: hover 2s -0.4s alternate infinite;
+  animation: hover 2s -0.4s alternate infinite;
+  background-color: #e3e3e3;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.textbox-action svg {
+  fill: #272343;
+  width: 65%;
+  height: 65%;
+  -webkit-animation: hover 2s -0.6s alternate infinite;
+  animation: hover 2s -0.6s alternate infinite;
+  -webkit-filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5));
+}
+.textbox-action .textbox-face {
+  background-color: #000000;
+  transition: all 0.2s ease;
+}
+.textbox-action .textbox-side {
+  width: 10px;
+}
+.textbox-action .textbox-bottom,
+.textbox-action .textbox-top {
+  height: 10px;
+}
+.textbox-action:hover {
+  cursor: pointer;
+  background-color: #9e3434;
+}
+.textbox-action:hover .textbox-face {
+  background-color: #000000;
+}
+.textbox-text {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+  font: 3.5rem sans-serif;
+  -webkit-animation: hover 2s -0.4s alternate infinite;
+  animation: hover 2s -0.4s alternate infinite;
+  display: block;
+  color: #272343;
+  -webkit-filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5));
+}
+.textbox-text::-moz-placeholder {
+  color: #272343;
+  opacity: 0.5;
+}
+.textbox-text:-ms-input-placeholder {
+  color: #272343;
+  opacity: 0.5;
+}
+.textbox-text::placeholder {
+  color: #272343;
+  opacity: 0.5;
+}
+.textbox-text:focus {
+  outline: none;
+}
+.textbox-face {
+  position: absolute;
+  background-color: #4c2566;
+  left: 0;
+}
+.textbox-side {
+  transform: rotateY(90deg);
+  height: 100%;
+  width: 20px;
+  top: 0;
+  transform-origin: 0% 50%;
+}
+.textbox-bottom {
+  transform: rotateX(90deg);
+  height: 20px;
+  width: 100%;
+  bottom: 0;
+  transform-origin: 50% 100%;
+}
+.textbox-top {
+  transform: rotateX(-90deg);
+  height: 20px;
+  width: 100%;
+  top: 0;
+  transform-origin: 50% 0;
+}
+
+@-webkit-keyframes hover {
+  from {
+    transform: translateZ(10px);
   }
-  & img {
-    height: inherit;
-    display: inline-block;
-    vertical-align: middle;
+  to {
+    transform: translateZ(20px);
   }
 }
 
-span#inpD {
+@keyframes hover {
+  from {
+    transform: translateZ(10px);
+  }
+  to {
+    transform: translateZ(20px);
+  }
+}
+@-webkit-keyframes turnaround {
+  0% {
+    transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
+  }
+  33% {
+    transform: perspective(500px) rotateY(20deg) rotateZ(-10deg) rotateX(-30deg);
+  }
+  67% {
+    transform: perspective(0) rotateY(0deg) rotateZ(0deg) rotateX(0deg);
+  }
+  100% {
+    transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
+  }
+}
+@keyframes turnaround {
+  0% {
+    transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
+  }
+  33% {
+    transform: perspective(500px) rotateY(20deg) rotateZ(-10deg) rotateX(-30deg);
+  }
+  67% {
+    transform: perspective(0) rotateY(0deg) rotateZ(0deg) rotateX(0deg);
+  }
+  100% {
+    transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
+  }
+}
+.reference {
   position: absolute;
-  top: 50vh;
-  right: 15vw;
-  & input {
-    font-size: 3em;
-    background-color: rgba(0,0,0,0.1);
-    color: whitesmoke;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  & img {
-    height: 5em;
-    margin-left: 2em;
-    display: inline-block;
-    vertical-align: middle;
-  }
+  right: 20px;
+  bottom: 15px;
+}
+.reference img {
+  width: 35px;
+  height: 35px;
 }
