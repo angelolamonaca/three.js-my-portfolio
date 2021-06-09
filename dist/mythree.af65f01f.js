@@ -45737,7 +45737,11 @@ var keys = {
   a: false,
   s: false,
   d: false,
-  w: false
+  w: false,
+  arrowup: false,
+  arrowdown: false,
+  arrowleft: false,
+  arrowright: false
 };
 var recruiterText, developerText, whoareyou;
 var raycaster = new THREE.Raycaster();
@@ -46007,46 +46011,46 @@ function animate() {
   if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector);
 
-    if (keys.w) {
+    if (keys.w || keys.arrowup) {
       frontVector.z += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
       activePlayerWalk.play();
       activePlayerIdle.stop();
-    } else if (!keys.w && activePlayerWalk) {
+    } else if (!keys.w && !keys.arrowup && activePlayerWalk) {
       activePlayerIdle.play();
       activePlayerWalk.stop();
     }
 
-    if (keys.s) {
+    if (keys.s || keys.arrowdown) {
       frontVector.z -= 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
       activePlayerWalkBackwards.play();
       activePlayerIdle.stop();
-    } else if (!keys.s && activePlayerWalkBackwards) {
+    } else if (!keys.s && !keys.arrowdown && activePlayerWalkBackwards) {
       activePlayerIdle.play();
       activePlayerWalkBackwards.stop();
     }
 
-    if (keys.a) {
+    if (keys.a || keys.arrowleft) {
       frontVector.x += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
       activePlayerWalkLeft.play();
       activePlayerIdle.stop();
-    } else if (!keys.a && activePlayerWalkLeft) {
+    } else if (!keys.a && !keys.arrowleft && activePlayerWalkLeft) {
       activePlayerIdle.play();
       activePlayerWalkLeft.stop();
     }
 
-    if (keys.d) {
+    if (keys.d || keys.arrowright) {
       frontVector.x -= 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
       activePlayerWalkRight.play();
       activePlayerIdle.stop();
-    } else if (!keys.d && activePlayerWalkRight) {
+    } else if (!keys.d && !keys.arrowright && activePlayerWalkRight) {
       activePlayerIdle.play();
       activePlayerWalkRight.stop();
     }
