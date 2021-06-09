@@ -45708,6 +45708,8 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+var inpR = document.getElementById('inpR');
+var inpD = document.getElementById('inpD');
 var camera, scene, renderer;
 var clock = new THREE.Clock();
 var recruiter,
@@ -45736,7 +45738,7 @@ var keys = {
   d: false,
   w: false
 };
-var recruiterText, developerText, friendText, whoareyou;
+var recruiterText, developerText, whoareyou;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var textLoader = new THREE.FontLoader();
@@ -45798,10 +45800,6 @@ function init() {
   scene.add(whoareyou);
   ambiente = new THREE.Scene();
   gltfLoader.load('models/cyberpunk-office/source/CyberpunkOffice.glb', function (object) {
-    // recruiterMixer = new THREE.AnimationMixer( object );
-    // recruiterAction = recruiterMixer.clipAction( object.animations[ 0 ] );
-    // recruiterAction.play()
-    // recruiterAction.timeScale = 0;
     object.scene.position.set(0, 0, 0);
     object.scene.scale.set(100, 100, 100);
     ambiente.add(object.scene);
@@ -45900,11 +45898,7 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   container.appendChild(renderer.domElement);
-  renderer.render(scene, camera); // Controllo orbitale
-  // const controls = new OrbitControls(camera, renderer.domElement);
-  // controls.target.set(0, 100, 0);
-  // controls.update();
-  // EventListeners
+  renderer.render(scene, camera); // EventListeners
 
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
@@ -45938,6 +45932,12 @@ function onMouseClick(event) {
   if (recruiterIntersects.length > 0) {
     console.log('hai cliccato su recruiter');
     removeEventsListener();
+    document.getElementById('wyn').hidden = false;
+    inpR.hidden = false;
+    developer.visible = false;
+    recruiterText.visible = false;
+    developerText.visible = false;
+    whoareyou.visible = false;
     (0, _follow.follow)(recruiter, camera);
     activePlayer = recruiter;
     frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z + 100);
@@ -45949,6 +45949,12 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer');
     removeEventsListener();
+    document.getElementById('wyn').hidden = false;
+    inpD.hidden = false;
+    recruiter.visible = false;
+    recruiterText.visible = false;
+    developerText.visible = false;
+    whoareyou.visible = false;
     (0, _follow.follow)(developer, camera);
     activePlayer = developer;
     frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z + 100);
@@ -45995,12 +46001,11 @@ function animate() {
   if (recruiterMixer) recruiterMixer.update(delta);
   if (developerMixer) developerMixer.update(delta);
 
-  if (activePlayer) {
+  if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector);
 
     if (keys.w) {
       console.log('Pressed w');
-      signed = true;
       frontVector.z += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46094,7 +46099,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51459" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61395" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

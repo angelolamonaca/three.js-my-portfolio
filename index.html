@@ -2,14 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="src/scss/mythree.scss">
   <title>Angelo Lamonaca</title>
-  <style>
-    body {
-      margin: 0;
-    }
-  </style>
 </head>
 <body>
+<span class="text" id="wyn" hidden>what's your name?</span>
+<form id="myForm">
+  <span id="inpR" hidden><input type="text" placeholder="YOUR NAME"/><img src="src/img/ok.png">ok</img></span>
+  <span id="inpD" hidden><input type="text" placeholder="YOUR NAME"/><img src="src/img/ok.png">ok</img></span>
+  <input type="submit" onclick="signed=true" hidden/>
+</form>
 <script src="src/mythree.js"></script>
+<script>
+  var form = document.getElementById("myForm");
+  function handleForm(event) { event.preventDefault(); }
+  form.addEventListener('submit', handleForm);
+</script>
 </body>
 </html>

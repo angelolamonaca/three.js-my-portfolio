@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="/mythree.dd278e1d.css">
   <title>Angelo Lamonaca</title>
-  <style>body {
-      margin: 0;
-    }</style>
-</head>
+<script src="/mythree.dd278e1d.js"></script></head>
 <body>
+<span class="text" id="wyn" hidden="">what's your name?</span>
+<form id="myForm">
+  <span id="inpR" hidden=""><input type="text" placeholder="YOUR NAME"><img src="/ok.7b357563.png">ok</span>
+  <span id="inpD" hidden=""><input type="text" placeholder="YOUR NAME"><img src="/ok.7b357563.png">ok</span>
+  <input type="submit" onclick="signed=true" hidden="">
+</form>
 <script src="/mythree.af65f01f.js"></script>
+<script>var form = document.getElementById("myForm");
+
+function handleForm(event) {
+  event.preventDefault();
+}
+
+form.addEventListener('submit', handleForm);</script>
 </body>
 </html>

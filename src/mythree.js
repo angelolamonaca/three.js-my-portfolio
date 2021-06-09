@@ -6,6 +6,8 @@ import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
 import {Vector3} from "three";
 
+let inpR =document.getElementById('inpR');
+let inpD =document.getElementById('inpD');
 let camera, scene, renderer;
 const clock = new THREE.Clock();
 let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft, recruiterWalkRight, recruiterHover = false;
@@ -23,7 +25,7 @@ let keys = {
   w: false
 };
 
-let recruiterText, developerText, friendText, whoareyou;
+let recruiterText, developerText, whoareyou;
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 const textLoader = new THREE.FontLoader();
@@ -94,13 +96,8 @@ function init() {
 
   ambiente = new THREE.Scene();
   gltfLoader.load('models/cyberpunk-office/source/CyberpunkOffice.glb', function (object) {
-    // recruiterMixer = new THREE.AnimationMixer( object );
-    // recruiterAction = recruiterMixer.clipAction( object.animations[ 0 ] );
-    // recruiterAction.play()
-    // recruiterAction.timeScale = 0;
     object.scene.position.set(0, 0, 0);
     object.scene.scale.set(100, 100, 100)
-
     ambiente.add(object.scene);
   });
   scene.add(ambiente);
@@ -215,11 +212,6 @@ function init() {
   container.appendChild(renderer.domElement);
   renderer.render(scene, camera);
 
-  // Controllo orbitale
-  // const controls = new OrbitControls(camera, renderer.domElement);
-  // controls.target.set(0, 100, 0);
-  // controls.update();
-
   // EventListeners
   document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
@@ -258,6 +250,12 @@ function onMouseClick(event) {
   if (recruiterIntersects.length > 0) {
     console.log('hai cliccato su recruiter')
     removeEventsListener()
+    document.getElementById('wyn').hidden=false;
+    inpR.hidden=false;
+    developer.visible = false;
+    recruiterText.visible=false;
+    developerText.visible = false;
+    whoareyou.visible = false;
     follow(recruiter, camera)
     activePlayer = recruiter;
     frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
@@ -269,6 +267,12 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer')
     removeEventsListener()
+    document.getElementById('wyn').hidden=false;
+    inpD.hidden=false;
+    recruiter.visible=false;
+    recruiterText.visible=false;
+    developerText.visible = false;
+    whoareyou.visible = false;
     follow(developer, camera)
     activePlayer = developer;
     frontVector.set(activePlayer.children[0].position.x, activePlayer.children[0].position.y, activePlayer.children[0].position.z+100)
@@ -315,11 +319,10 @@ function animate() {
   const delta = clock.getDelta();
   if (recruiterMixer) recruiterMixer.update(delta);
   if (developerMixer) developerMixer.update(delta);
-  if (activePlayer) {
+  if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector)
     if (keys.w) {
       console.log('Pressed w')
-      signed=true
       frontVector.z+=1
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z-100)
       camera.position.set(frontVector.x, frontVector.y+225, frontVector.z-400)
