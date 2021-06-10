@@ -45689,6 +45689,66 @@ function follow(player, camera) {
   camera.position.lerp(cameraOffset, 0.1);
   camera.lookAt(player.position.x, player.position.y + 225, player.position.z);
 }
+},{"three":"node_modules/three/build/three.module.js"}],"src/angelo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.main = main;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function main(fbxLoader, scene, angelo) {
+  // Recruiter
+  angelo = new THREE.Scene();
+  fbxLoader.load('models/developer/rick_v1.fbx', function (fbx) {
+    fbx.position.set(0, 0, 400);
+    fbx.rotateY(9);
+    fbx.scale.setScalar(1.2);
+    fbx.traverse(function (c) {
+      c.castShadow = true;
+    });
+    angelo.add(fbx); // recruiterMixer = new THREE.AnimationMixer(fbx);
+    // fbxLoader.load('models/recruiter/Offensive_Idle.fbx', (anim) => {
+    //   recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
+    // })
+    // recruiter.add(fbx);
+    //
+    // fbxLoader.load('models/recruiter/Dwarf_Walk.fbx', (anim) => {
+    //   recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
+    // })
+    // recruiter.add(fbx);
+    //
+    // fbxLoader.load('models/recruiter/Walking_Backward.fbx', (anim) => {
+    //   recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
+    // })
+    // recruiter.add(fbx);
+    //
+    // fbxLoader.load('models/recruiter/Walk_Strafe_Left.fbx', (anim) => {
+    //   recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
+    // })
+    // recruiter.add(fbx);
+    //
+    // fbxLoader.load('models/recruiter/Walk_Strafe_Right.fbx', (anim) => {
+    //   recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
+    // })
+    // recruiter.add(fbx);
+  });
+  scene.add(angelo); // Recruiter Text
+  // recruiterText = new THREE.Scene();
+  // textLoader.load(fontUrl, function (font) {
+  //   const geometry = creaGeometria('Recruiter', font, 50)
+  //   const text = new THREE.Mesh(geometry, textColor);
+  //   text.position.set(-370, 0, 150)
+  //   recruiterText.add(text)
+  // });
+  // scene.add(recruiterText);
+}
 },{"three":"node_modules/three/build/three.module.js"}],"src/mythree.js":[function(require,module,exports) {
 "use strict";
 
@@ -45704,12 +45764,15 @@ var _FBXLoader = require("three/examples/jsm/loaders/FBXLoader");
 
 var _follow = require("./follow");
 
+var _angelo = require("./angelo");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 var camera, scene, renderer;
 var clock = new THREE.Clock();
+var gltfLoader, dracoLoader, fbxLoader;
 var recruiter,
     recruiterMixer,
     recruiterIdle,
@@ -45727,6 +45790,7 @@ var developer,
     developerWalkRight,
     developerHover = false;
 var activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft, activePlayerWalkRight;
+var angelo;
 var ambiente;
 var signed;
 var frontVector = new THREE.Vector3();
@@ -45790,9 +45854,9 @@ function init() {
     console.log('There was an error loading ' + url);
   };
 
-  var gltfLoader = new _GLTFLoader.GLTFLoader(manager);
-  var dracoLoader = new _DRACOLoader.DRACOLoader(manager);
-  var fbxLoader = new _FBXLoader.FBXLoader(manager);
+  gltfLoader = new _GLTFLoader.GLTFLoader(manager);
+  dracoLoader = new _DRACOLoader.DRACOLoader(manager);
+  fbxLoader = new _FBXLoader.FBXLoader(manager);
   dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
   gltfLoader.setDRACOLoader(dracoLoader); // Scena principale
 
@@ -45818,30 +45882,30 @@ function init() {
   (0, _light.adjustLight)(hemiLight, dirLight, scene); // Recruiter
 
   recruiter = new THREE.Scene();
-  fbxLoader.load('models/recruiter/Robot.fbx', function (fbx) {
+  fbxLoader.load('models/recruiter/mrmeeseeks_original.fbx', function (fbx) {
     fbx.position.set(-290, 0, 50);
-    fbx.scale.setScalar(1.2);
+    fbx.scale.setScalar(9);
     fbx.traverse(function (c) {
       c.castShadow = true;
     });
     recruiterMixer = new THREE.AnimationMixer(fbx);
-    fbxLoader.load('models/recruiter/Offensive_Idle.fbx', function (anim) {
+    fbxLoader.load('models/recruiter/breathing_idle.fbx', function (anim) {
       recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
     });
     recruiter.add(fbx);
-    fbxLoader.load('models/recruiter/Dwarf_Walk.fbx', function (anim) {
+    fbxLoader.load('models/recruiter/happy_walk.fbx', function (anim) {
       recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
     });
     recruiter.add(fbx);
-    fbxLoader.load('models/recruiter/Walking_Backward.fbx', function (anim) {
+    fbxLoader.load('models/recruiter/happy_walk_backwards.fbx', function (anim) {
       recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
     });
     recruiter.add(fbx);
-    fbxLoader.load('models/recruiter/Walk_Strafe_Left.fbx', function (anim) {
+    fbxLoader.load('models/recruiter/walk_left.fbx', function (anim) {
       recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
     });
     recruiter.add(fbx);
-    fbxLoader.load('models/recruiter/Walk_Strafe_Right.fbx', function (anim) {
+    fbxLoader.load('models/recruiter/walk_right.fbx', function (anim) {
       recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
     });
     recruiter.add(fbx);
@@ -45858,31 +45922,31 @@ function init() {
   scene.add(recruiterText); // developer
 
   developer = new THREE.Scene();
-  fbxLoader.load('models/developer/Robot.fbx', function (fbx) {
-    fbx.position.set(290, 0, 50);
-    fbx.scale.setScalar(3);
+  fbxLoader.load('models/developer/rick_rigged_original.fbx', function (fbx) {
+    fbx.position.set(290, 0, 70);
+    fbx.scale.setScalar(1.3);
     fbx.traverse(function (c) {
       c.castShadow = true;
     });
     developerMixer = new THREE.AnimationMixer(fbx);
-    fbxLoader.load('models/developer/Warrior_Idle.fbx', function (anim) {
+    fbxLoader.load('models/developer/drunk_idle.fbx', function (anim) {
       developerIdle = developerMixer.clipAction(anim.animations[0]);
       developerIdle.play();
     });
     developer.add(fbx);
-    fbxLoader.load('models/developer/Dwarf_Walk.fbx', function (anim) {
+    fbxLoader.load('models/developer/drunk_walk.fbx', function (anim) {
       developerWalk = developerMixer.clipAction(anim.animations[0]);
     });
     developer.add(fbx);
-    fbxLoader.load('models/developer/Walking_Backward.fbx', function (anim) {
+    fbxLoader.load('models/developer/drunk_walk_backwards.fbx', function (anim) {
       developerWalkBackwards = developerMixer.clipAction(anim.animations[0]);
     });
     developer.add(fbx);
-    fbxLoader.load('models/developer/Walk_Strafe_Left.fbx', function (anim) {
+    fbxLoader.load('models/developer/left_walk.fbx', function (anim) {
       developerWalkLeft = developerMixer.clipAction(anim.animations[0]);
     });
     developer.add(fbx);
-    fbxLoader.load('models/developer/Walk_Strafe_Right.fbx', function (anim) {
+    fbxLoader.load('models/developer/right_walk.fbx', function (anim) {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
     });
     developer.add(fbx);
@@ -46108,8 +46172,9 @@ function welcome(user) {
   });
   scene.add(welcome);
   welcome.rotateY(9.43);
+  (0, _angelo.main)(fbxLoader, scene, angelo);
 }
-},{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js","./angelo":"src/angelo.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -46137,7 +46202,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51147" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51167" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -221,15 +221,5 @@ body {
     transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
   }
 }
-.reference {
-  position: absolute;
-  right: 20px;
-  bottom: 15px;
-}
-
-.reference img {
-  width: 35px;
-  height: 35px;
-}
 
 /*# sourceMappingURL=/mythree.dd278e1d.css.map */

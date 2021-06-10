@@ -4,16 +4,19 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
+import {main} from "./angelo";
 import {Vector3} from "three";
 
 let camera, scene, renderer;
 const clock = new THREE.Clock();
+let gltfLoader, dracoLoader, fbxLoader;
 let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft,
   recruiterWalkRight, recruiterHover = false;
 let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft,
   developerWalkRight, developerHover = false;
 let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft,
   activePlayerWalkRight;
+let angelo;
 let ambiente;
 
 let signed;
@@ -86,9 +89,9 @@ function init() {
     console.log('There was an error loading ' + url);
   };
 
-  const gltfLoader = new GLTFLoader(manager);
-  const dracoLoader = new DRACOLoader(manager);
-  const fbxLoader = new FBXLoader(manager)
+  gltfLoader = new GLTFLoader(manager);
+  dracoLoader = new DRACOLoader(manager);
+  fbxLoader = new FBXLoader(manager)
   dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
   gltfLoader.setDRACOLoader(dracoLoader);
 
@@ -120,36 +123,36 @@ function init() {
 
   // Recruiter
   recruiter = new THREE.Scene();
-  fbxLoader.load('models/recruiter/Robot.fbx', (fbx) => {
+  fbxLoader.load('models/recruiter/mrmeeseeks_original.fbx', (fbx) => {
 
     fbx.position.set(-290, 0, 50);
-    fbx.scale.setScalar(1.2);
+    fbx.scale.setScalar(9);
     fbx.traverse(c => {
       c.castShadow = true;
     })
 
     recruiterMixer = new THREE.AnimationMixer(fbx);
-    fbxLoader.load('models/recruiter/Offensive_Idle.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/breathing_idle.fbx', (anim) => {
       recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
     })
     recruiter.add(fbx);
 
-    fbxLoader.load('models/recruiter/Dwarf_Walk.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/happy_walk.fbx', (anim) => {
       recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
     })
     recruiter.add(fbx);
 
-    fbxLoader.load('models/recruiter/Walking_Backward.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/happy_walk_backwards.fbx', (anim) => {
       recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
     })
     recruiter.add(fbx);
 
-    fbxLoader.load('models/recruiter/Walk_Strafe_Left.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/walk_left.fbx', (anim) => {
       recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
     })
     recruiter.add(fbx);
 
-    fbxLoader.load('models/recruiter/Walk_Strafe_Right.fbx', (anim) => {
+    fbxLoader.load('models/recruiter/walk_right.fbx', (anim) => {
       recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
     })
     recruiter.add(fbx);
@@ -168,37 +171,37 @@ function init() {
 
   // developer
   developer = new THREE.Scene();
-  fbxLoader.load('models/developer/Robot.fbx', (fbx) => {
+  fbxLoader.load('models/developer/rick_rigged_original.fbx', (fbx) => {
 
-    fbx.position.set(290, 0, 50);
-    fbx.scale.setScalar(3);
+    fbx.position.set(290, 0, 70);
+    fbx.scale.setScalar(1.3);
     fbx.traverse(c => {
       c.castShadow = true;
     })
 
     developerMixer = new THREE.AnimationMixer(fbx);
-    fbxLoader.load('models/developer/Warrior_Idle.fbx', (anim) => {
+    fbxLoader.load('models/developer/drunk_idle.fbx', (anim) => {
       developerIdle = developerMixer.clipAction(anim.animations[0])
       developerIdle.play()
     })
     developer.add(fbx);
 
-    fbxLoader.load('models/developer/Dwarf_Walk.fbx', (anim) => {
+    fbxLoader.load('models/developer/drunk_walk.fbx', (anim) => {
       developerWalk = developerMixer.clipAction(anim.animations[0]);
     })
     developer.add(fbx);
 
-    fbxLoader.load('models/developer/Walking_Backward.fbx', (anim) => {
+    fbxLoader.load('models/developer/drunk_walk_backwards.fbx', (anim) => {
       developerWalkBackwards = developerMixer.clipAction(anim.animations[0]);
     })
     developer.add(fbx);
 
-    fbxLoader.load('models/developer/Walk_Strafe_Left.fbx', (anim) => {
+    fbxLoader.load('models/developer/left_walk.fbx', (anim) => {
       developerWalkLeft = developerMixer.clipAction(anim.animations[0]);
     })
     developer.add(fbx);
 
-    fbxLoader.load('models/developer/Walk_Strafe_Right.fbx', (anim) => {
+    fbxLoader.load('models/developer/right_walk.fbx', (anim) => {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
     })
     developer.add(fbx);
@@ -435,4 +438,5 @@ function welcome(user) {
   });
   scene.add(welcome);
   welcome.rotateY(9.43)
+  main(fbxLoader, scene, angelo)
 }
