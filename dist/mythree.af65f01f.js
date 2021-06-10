@@ -45708,9 +45708,6 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-var wyn = document.getElementById('wyn');
-var inpR = document.getElementById('inpR');
-var inpD = document.getElementById('inpD');
 var camera, scene, renderer;
 var clock = new THREE.Clock();
 var recruiter,
@@ -45733,6 +45730,11 @@ var activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards,
 var ambiente;
 var signed;
 var frontVector = new THREE.Vector3();
+var user = {
+  type: null,
+  name: null,
+  email: null
+};
 var keys = {
   a: false,
   s: false,
@@ -45797,7 +45799,7 @@ function init() {
   scene = new THREE.Scene();
   whoareyou = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    var geometry = creaGeometria('who are you', font);
+    var geometry = creaGeometria('who are you', font, 50);
     var text = new THREE.Mesh(geometry, textColor);
     text.position.set(-180, 350, 250);
     whoareyou.add(text);
@@ -45848,7 +45850,7 @@ function init() {
 
   recruiterText = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    var geometry = creaGeometria('Recruiter', font);
+    var geometry = creaGeometria('Recruiter', font, 50);
     var text = new THREE.Mesh(geometry, textColor);
     text.position.set(-370, 0, 150);
     recruiterText.add(text);
@@ -45889,7 +45891,7 @@ function init() {
 
   developerText = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    var geometry = creaGeometria('Developer', font);
+    var geometry = creaGeometria('Developer', font, 50);
     var text = new THREE.Mesh(geometry, textColor);
     text.position.set(120, 0, 150);
     developerText.add(text);
@@ -45920,10 +45922,10 @@ function init() {
   });
 }
 
-function creaGeometria(nome, font) {
+function creaGeometria(nome, font, size) {
   return new THREE.TextGeometry(nome, {
     font: font,
-    size: 50,
+    size: size,
     height: 1
   });
 }
@@ -45940,7 +45942,7 @@ function onMouseClick(event) {
     console.log('hai cliccato su recruiter');
     removeEventsListener();
     document.getElementById('wyn').hidden = false;
-    inpR.hidden = false;
+    document.getElementById('inpR').hidden = false;
     developer.visible = false;
     recruiterText.visible = false;
     developerText.visible = false;
@@ -45956,8 +45958,8 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer');
     removeEventsListener();
-    wyn.hidden = false;
-    inpD.hidden = false;
+    document.getElementById('wyn').hidden = false;
+    document.getElementById('inpD').hidden = false;
     recruiter.visible = false;
     recruiterText.visible = false;
     developerText.visible = false;
@@ -46076,15 +46078,36 @@ function onTransitionEnd(event) {
 }
 
 function signin() {
-  console.log(document.getElementById('inpDname').value);
-  console.log(document.getElementById('inpRname').value);
-  wyn.hidden = true;
-  inpR.hidden = true;
-  inpD.hidden = true;
+  if (document.getElementById('inpDname').value) {
+    user.type = 'developer';
+    user.name = document.getElementById('inpDname').value;
+    welcome(user);
+  } else if (document.getElementById('inpRname').value) {
+    user.type = 'recruiter';
+    user.name = document.getElementById('inpRname').value;
+    welcome(user);
+  } else return;
+
+  console.log(user);
+  document.getElementById('wyn').hidden = true;
+  document.getElementById('inpR').hidden = true;
+  document.getElementById('inpD').hidden = true;
   signed = true;
   frontVector.z += 1;
   activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
   camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
+}
+
+function welcome(user) {
+  var welcome = new THREE.Scene();
+  textLoader.load(fontUrl, function (font) {
+    var geometry = creaGeometria('welcome ' + user.name, font, 30);
+    var text = new THREE.Mesh(geometry, textColor);
+    if (user.type === 'developer') text.position.set(-450, 300, 0);else text.position.set(100, 300, 0);
+    welcome.add(text);
+  });
+  scene.add(welcome);
+  welcome.rotateY(9.43);
 }
 },{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -46114,7 +46137,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61395" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51147" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

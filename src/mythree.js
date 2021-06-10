@@ -6,9 +6,6 @@ import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
 import {Vector3} from "three";
 
-let wyn = document.getElementById('wyn');
-let inpR = document.getElementById('inpR');
-let inpD = document.getElementById('inpD');
 let camera, scene, renderer;
 const clock = new THREE.Clock();
 let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft,
@@ -21,6 +18,12 @@ let ambiente;
 
 let signed;
 let frontVector = new Vector3();
+
+let user= {
+  type: null,
+  name: null,
+  email: null
+};
 
 let keys = {
   a: false,
@@ -94,7 +97,7 @@ function init() {
 
   whoareyou = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    const geometry = creaGeometria('who are you', font)
+    const geometry = creaGeometria('who are you', font, 50)
     const text = new THREE.Mesh(geometry, textColor);
     text.position.set(-180, 350, 250)
     whoareyou.add(text)
@@ -156,7 +159,7 @@ function init() {
   // Recruiter Text
   recruiterText = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    const geometry = creaGeometria('Recruiter', font)
+    const geometry = creaGeometria('Recruiter', font, 50)
     const text = new THREE.Mesh(geometry, textColor);
     text.position.set(-370, 0, 150)
     recruiterText.add(text)
@@ -205,7 +208,7 @@ function init() {
   // Developer Text
   developerText = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    const geometry = creaGeometria('Developer', font)
+    const geometry = creaGeometria('Developer', font, 50)
     const text = new THREE.Mesh(geometry, textColor);
     text.position.set(120, 0, 150)
     developerText.add(text)
@@ -240,10 +243,10 @@ function init() {
 
 }
 
-function creaGeometria(nome, font) {
+function creaGeometria(nome, font, size) {
   return new THREE.TextGeometry(nome, {
     font: font,
-    size: 50,
+    size: size,
     height: 1
   })
 }
@@ -261,7 +264,7 @@ function onMouseClick(event) {
     console.log('hai cliccato su recruiter')
     removeEventsListener()
     document.getElementById('wyn').hidden = false;
-    inpR.hidden = false;
+    document.getElementById('inpR').hidden = false;
     developer.visible = false;
     recruiterText.visible = false;
     developerText.visible = false;
@@ -277,8 +280,8 @@ function onMouseClick(event) {
   } else if (developerIntersects.length > 0) {
     console.log('hai cliccato su developer')
     removeEventsListener()
-    wyn.hidden = false;
-    inpD.hidden = false;
+    document.getElementById('wyn').hidden = false;
+    document.getElementById('inpD').hidden = false;
     recruiter.visible = false;
     recruiterText.visible = false;
     developerText.visible = false;
@@ -399,13 +402,37 @@ function onTransitionEnd(event) {
 }
 
 function signin() {
-  console.log(document.getElementById('inpDname').value)
-  console.log(document.getElementById('inpRname').value)
-  wyn.hidden=true;
-  inpR.hidden=true;
-  inpD.hidden=true;
+  if (document.getElementById('inpDname').value) {
+    user.type = 'developer'
+    user.name = document.getElementById('inpDname').value;
+    welcome(user)
+  }
+  else if (document.getElementById('inpRname').value) {
+    user.type = 'recruiter'
+    user.name = document.getElementById('inpRname').value;
+    welcome(user)
+  } else return;
+  console.log(user)
+  document.getElementById('wyn').hidden=true;
+  document.getElementById('inpR').hidden=true;
+  document.getElementById('inpD').hidden=true;
   signed=true;
   frontVector.z += 1
   activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
   camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
+}
+
+function welcome(user) {
+  let welcome = new THREE.Scene();
+  textLoader.load(fontUrl, function (font) {
+    const geometry = creaGeometria('welcome '+user.name, font, 30)
+    const text = new THREE.Mesh(geometry, textColor);
+    if (user.type==='developer')
+    text.position.set(-450, 300, 0)
+    else
+      text.position.set(100, 300, 0)
+    welcome.add(text)
+  });
+  scene.add(welcome);
+  welcome.rotateY(9.43)
 }
