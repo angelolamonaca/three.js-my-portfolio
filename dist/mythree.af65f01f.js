@@ -45689,66 +45689,6 @@ function follow(player, camera) {
   camera.position.lerp(cameraOffset, 0.1);
   camera.lookAt(player.position.x, player.position.y + 225, player.position.z);
 }
-},{"three":"node_modules/three/build/three.module.js"}],"src/angelo.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.main = main;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function main(fbxLoader, scene, angelo) {
-  // Recruiter
-  angelo = new THREE.Scene();
-  fbxLoader.load('models/developer/rick_v1.fbx', function (fbx) {
-    fbx.position.set(0, 0, 400);
-    fbx.rotateY(9);
-    fbx.scale.setScalar(1.2);
-    fbx.traverse(function (c) {
-      c.castShadow = true;
-    });
-    angelo.add(fbx); // recruiterMixer = new THREE.AnimationMixer(fbx);
-    // fbxLoader.load('models/recruiter/Offensive_Idle.fbx', (anim) => {
-    //   recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
-    // })
-    // recruiter.add(fbx);
-    //
-    // fbxLoader.load('models/recruiter/Dwarf_Walk.fbx', (anim) => {
-    //   recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
-    // })
-    // recruiter.add(fbx);
-    //
-    // fbxLoader.load('models/recruiter/Walking_Backward.fbx', (anim) => {
-    //   recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
-    // })
-    // recruiter.add(fbx);
-    //
-    // fbxLoader.load('models/recruiter/Walk_Strafe_Left.fbx', (anim) => {
-    //   recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
-    // })
-    // recruiter.add(fbx);
-    //
-    // fbxLoader.load('models/recruiter/Walk_Strafe_Right.fbx', (anim) => {
-    //   recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
-    // })
-    // recruiter.add(fbx);
-  });
-  scene.add(angelo); // Recruiter Text
-  // recruiterText = new THREE.Scene();
-  // textLoader.load(fontUrl, function (font) {
-  //   const geometry = creaGeometria('Recruiter', font, 50)
-  //   const text = new THREE.Mesh(geometry, textColor);
-  //   text.position.set(-370, 0, 150)
-  //   recruiterText.add(text)
-  // });
-  // scene.add(recruiterText);
-}
 },{"three":"node_modules/three/build/three.module.js"}],"src/mythree.js":[function(require,module,exports) {
 "use strict";
 
@@ -45763,8 +45703,6 @@ var _DRACOLoader = require("three/examples/jsm/loaders/DRACOLoader");
 var _FBXLoader = require("three/examples/jsm/loaders/FBXLoader");
 
 var _follow = require("./follow");
-
-var _angelo = require("./angelo");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -45788,10 +45726,13 @@ var developer,
     developerWalkBackwards,
     developerWalkLeft,
     developerWalkRight,
+    developerEndAnim,
     developerHover = false;
 var activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft, activePlayerWalkRight;
-var angelo;
+var angelo, angeloMixer, angeloIdle, angeloIdle2, angeloIdle3, angeloText;
 var ambiente;
+var chatTimer, chatIndex;
+var chatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
 var signed;
 var frontVector = new THREE.Vector3();
 var user = {
@@ -45807,7 +45748,8 @@ var keys = {
   arrowup: false,
   arrowdown: false,
   arrowleft: false,
-  arrowright: false
+  arrowright: false,
+  space: false
 };
 var recruiterText, developerText, whoareyou;
 var raycaster = new THREE.Raycaster();
@@ -45892,19 +45834,15 @@ function init() {
     fbxLoader.load('models/recruiter/breathing_idle.fbx', function (anim) {
       recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
     });
-    recruiter.add(fbx);
     fbxLoader.load('models/recruiter/happy_walk.fbx', function (anim) {
       recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
     });
-    recruiter.add(fbx);
     fbxLoader.load('models/recruiter/happy_walk_backwards.fbx', function (anim) {
       recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
     });
-    recruiter.add(fbx);
     fbxLoader.load('models/recruiter/walk_left.fbx', function (anim) {
       recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
     });
-    recruiter.add(fbx);
     fbxLoader.load('models/recruiter/walk_right.fbx', function (anim) {
       recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
     });
@@ -45930,24 +45868,22 @@ function init() {
     });
     developerMixer = new THREE.AnimationMixer(fbx);
     fbxLoader.load('models/developer/drunk_idle.fbx', function (anim) {
-      developerIdle = developerMixer.clipAction(anim.animations[0]);
-      developerIdle.play();
+      developerIdle = developerMixer.clipAction(anim.animations[0]).play();
     });
-    developer.add(fbx);
     fbxLoader.load('models/developer/drunk_walk.fbx', function (anim) {
       developerWalk = developerMixer.clipAction(anim.animations[0]);
     });
-    developer.add(fbx);
     fbxLoader.load('models/developer/drunk_walk_backwards.fbx', function (anim) {
       developerWalkBackwards = developerMixer.clipAction(anim.animations[0]);
     });
-    developer.add(fbx);
     fbxLoader.load('models/developer/left_walk.fbx', function (anim) {
       developerWalkLeft = developerMixer.clipAction(anim.animations[0]);
     });
-    developer.add(fbx);
     fbxLoader.load('models/developer/right_walk.fbx', function (anim) {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
+    });
+    fbxLoader.load('models/developer/gunplay.fbx', function (anim) {
+      developerEndAnim = developerMixer.clipAction(anim.animations[0]);
     });
     developer.add(fbx);
   });
@@ -45960,7 +45896,34 @@ function init() {
     text.position.set(120, 0, 150);
     developerText.add(text);
   });
-  scene.add(developerText); // Renderer
+  scene.add(developerText); // Angelo
+
+  angelo = new THREE.Scene();
+  fbxLoader.load('models/angelo/morty_original.fbx', function (fbx) {
+    fbx.position.set(0, 0, 350);
+    fbx.rotateY(9.3);
+    fbx.scale.setScalar(0.6);
+    fbx.traverse(function (c) {
+      c.castShadow = true;
+    });
+    angeloMixer = new THREE.AnimationMixer(fbx);
+    fbxLoader.load('models/angelo/sad_idle.fbx', function (anim) {
+      angeloIdle = angeloMixer.clipAction(anim.animations[0]).play();
+    });
+    fbxLoader.load('models/angelo/sad_idle_2.fbx', function (anim) {
+      angeloIdle2 = angeloMixer.clipAction(anim.animations[0]);
+    });
+    angelo.add(fbx);
+  }); //angelo Text
+
+  angeloText = new THREE.Scene();
+  textLoader.load(fontUrl, function (font) {
+    var geometry = creaGeometria('angelo', font, 30);
+    var text = new THREE.Mesh(geometry, textColor);
+    text.position.set(65, 200, 340);
+    text.rotateY(9.3);
+    angeloText.add(text);
+  }); // Renderer
 
   renderer = new THREE.WebGLRenderer({
     antialias: true
@@ -46003,7 +45966,6 @@ function onMouseClick(event) {
   var developerIntersects = raycaster.intersectObjects(developer.children, true);
 
   if (recruiterIntersects.length > 0) {
-    console.log('hai cliccato su recruiter');
     removeEventsListener();
     document.getElementById('wyn').hidden = false;
     document.getElementById('inpR').hidden = false;
@@ -46020,7 +45982,6 @@ function onMouseClick(event) {
     activePlayerWalkLeft = recruiterWalkLeft;
     activePlayerWalkRight = recruiterWalkRight;
   } else if (developerIntersects.length > 0) {
-    console.log('hai cliccato su developer');
     removeEventsListener();
     document.getElementById('wyn').hidden = false;
     document.getElementById('inpD').hidden = false;
@@ -46073,6 +46034,7 @@ function animate() {
   var delta = clock.getDelta();
   if (recruiterMixer) recruiterMixer.update(delta);
   if (developerMixer) developerMixer.update(delta);
+  if (angeloMixer) angeloMixer.update(delta);
 
   if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector);
@@ -46121,11 +46083,67 @@ function animate() {
       activePlayerWalkRight.stop();
     }
 
-    if (activePlayer && signed) {// camera.lookAt(frontVector.x, frontVector.y+225, frontVector.z)
+    if (activePlayer.children[0].position.x > -150 && activePlayer.children[0].position.x < 150 && activePlayer.children[0].position.z > 190 && activePlayer.children[0].position.z < 350) {
+      if (chatTimer === undefined) document.getElementById('clickSpace').hidden = false;
+
+      if (keys.space) {
+        chatHandler();
+      }
+    } else {
+      document.getElementById('clickSpace').hidden = true;
     }
   }
 
   render();
+}
+
+function chatHandler() {
+  if (chatTimer === undefined) {
+    angeloIdle2.play();
+    angeloIdle.stop();
+    chatIndex = 0;
+    chatTimer = Date.now() / 1000;
+    document.getElementById('chat').innerText = 'Angelo: Hi ' + user.name + '!';
+    document.getElementById('clickSpace').hidden = true;
+    document.getElementById('chat').hidden = false;
+  }
+
+  if (Date.now() / 1000 - chatTimer > 1) {
+    chatTimer = Date.now() / 1000;
+
+    if (chatIndex > 2) {
+      choose();
+      return;
+    }
+
+    chatIndex++;
+    document.getElementById('chat').innerText = chatArray[chatIndex];
+  }
+}
+
+function choose() {
+  document.getElementById('choose').hidden = false;
+  document.getElementById('no').addEventListener('click', function (onMouseClick) {
+    document.getElementById('choose').hidden = true;
+    document.getElementById('chat').hidden = true;
+    chatTimer = undefined;
+  });
+  document.getElementById('yes').addEventListener('click', function (onMouseClick) {
+    document.getElementById('choose').hidden = true; // document.getElementById('chat').innerText = 'Thank you!';
+    //DA ELIMINARE START
+
+    document.getElementById('chat').innerText = 'Something went wrong, come back in the next few days!';
+    setTimeout(function () {
+      document.getElementById('chat').hidden = true;
+      document.getElementById('clickSpace').hidden = true;
+      chatTimer = undefined;
+    }, 2000); //DA ELIMINARE FINE
+    // if (user.type === 'developer') {
+    //   setTimeout(function(){ window.location.replace("https://stackoverflow.com") }, 3000)
+    // } else if (user.type === 'recruiter') {
+    //   setTimeout(function(){ window.location.replace("https://stackoverflow.com") }, 3000)
+    // }
+  });
 }
 
 function onDocumentMouseMove(event) {
@@ -46172,9 +46190,10 @@ function welcome(user) {
   });
   scene.add(welcome);
   welcome.rotateY(9.43);
-  (0, _angelo.main)(fbxLoader, scene, angelo);
+  scene.add(angelo);
+  scene.add(angeloText);
 }
-},{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js","./angelo":"src/angelo.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -46202,7 +46221,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51167" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59960" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

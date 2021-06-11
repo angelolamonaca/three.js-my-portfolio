@@ -2,6 +2,51 @@ body {
   margin: 0;
 }
 
+#yes {
+  position: absolute;
+  top: 30vh;
+  left: 20vw;
+  filter: drop-shadow(0 0 0.25rem whitesmoke);
+}
+
+#no {
+  position: absolute;
+  top: 30vh;
+  right: 20vw;
+  filter: drop-shadow(0 0 0.25rem whitesmoke);
+}
+
+#yes:hover, #no:hover {
+  -webkit-animation: spin 4s linear infinite;
+  -moz-animation: spin 4s linear infinite;
+  animation: spin 4s linear infinite;
+  filter: drop-shadow(0 0 0.75rem whitesmoke);
+}
+
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+#clickSpace {
+  position: absolute;
+  top: unset;
+  bottom: 5vh;
+  font-size: 2vw;
+  left: 10vw;
+}
+
 .text {
   position: absolute;
   margin-right: auto;
@@ -10,7 +55,7 @@ body {
   transform: translate(50%, -50%);
   text-transform: uppercase;
   font-family: verdana;
-  font-size: 5em;
+  font-size: 4vw;
   font-weight: 700;
   color: #f5f5f5;
   text-shadow: 1px 1px 1px #919191, 1px 2px 1px #919191, 1px 3px 1px #919191, 1px 4px 1px #919191, 1px 5px 1px #919191, 1px 6px 1px #919191, 1px 7px 1px #919191, 1px 8px 1px #919191, 1px 9px 1px #919191, 1px 10px 1px #919191, 1px 18px 6px rgba(16, 16, 16, 0.4), 1px 22px 10px rgba(16, 16, 16, 0.2), 1px 25px 35px rgba(16, 16, 16, 0.2), 1px 30px 60px rgba(16, 16, 16, 0.4);
@@ -24,9 +69,9 @@ body {
 
 .textbox#inpD {
   top: 50vh;
-  right: 50vh;
-  width: 500px;
-  height: 110px;
+  right: 15vw;
+  width: 40vw;
+  height: 15vh;
   position: absolute;
   transform-style: preserve-3d;
   -webkit-animation: turnaround 20s infinite;
@@ -35,9 +80,9 @@ body {
 
 .textbox#inpR {
   top: 50vh;
-  left: 60vh;
-  width: 500px;
-  height: 110px;
+  left: 20vw;
+  width: 40vw;
+  height: 15vh;
   position: absolute;
   transform-style: preserve-3d;
   -webkit-animation: turnaround 20s infinite;
@@ -120,7 +165,7 @@ body {
   height: 100%;
   border: none;
   background-color: transparent;
-  font: 3.5rem sans-serif;
+  font: 4vw sans-serif;
   -webkit-animation: hover 2s -0.4s alternate infinite;
   animation: hover 2s -0.4s alternate infinite;
   display: block;
@@ -219,6 +264,41 @@ body {
   }
   100% {
     transform: perspective(500px) rotateY(70deg) rotateZ(-10deg) rotateX(30deg);
+  }
+}
+.box {
+  position: absolute;
+  bottom: 5vh;
+  left: 35vw;
+  font-size: 1.5vw;
+  font-family: "Agency FB", Arial, sans-serif;
+  border-radius: 2px;
+  padding: 0.8vw;
+  width: 30vw;
+  height: 8vh;
+  line-height: 16px;
+  margin: auto;
+  background: white;
+  border: 1px solid white;
+  box-shadow: 0 1px 0 1px black, inset 0 1px 0 1px black, 0 0 0 1px black, inset 0 0 0 1px black;
+}
+
+.box > i {
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: black;
+  margin-top: 23px;
+  animation: bounce 0.5s ease-in-out 0 infinite alternate;
+  float: right;
+}
+
+@keyframes bounce {
+  from {
+    margin-top: 20px;
+  }
+  to {
+    margin-top: 23px;
   }
 }
 

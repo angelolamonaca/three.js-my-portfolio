@@ -4,7 +4,6 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
-import {main} from "./angelo";
 import {Vector3} from "three";
 
 let camera, scene, renderer;
@@ -13,16 +12,18 @@ let gltfLoader, dracoLoader, fbxLoader;
 let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft,
   recruiterWalkRight, recruiterHover = false;
 let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft,
-  developerWalkRight, developerHover = false;
+  developerWalkRight, developerEndAnim, developerHover = false;
 let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft,
   activePlayerWalkRight;
-let angelo;
+let angelo, angeloMixer, angeloIdle, angeloIdle2, angeloIdle3, angeloText;
 let ambiente;
+let chatTimer, chatIndex;
+let chatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
 
 let signed;
 let frontVector = new Vector3();
 
-let user= {
+let user = {
   type: null,
   name: null,
   email: null
@@ -37,6 +38,7 @@ let keys = {
   arrowdown: false,
   arrowleft: false,
   arrowright: false,
+  space: false
 };
 
 let recruiterText, developerText, whoareyou;
@@ -124,34 +126,24 @@ function init() {
   // Recruiter
   recruiter = new THREE.Scene();
   fbxLoader.load('models/recruiter/mrmeeseeks_original.fbx', (fbx) => {
-
     fbx.position.set(-290, 0, 50);
     fbx.scale.setScalar(9);
     fbx.traverse(c => {
       c.castShadow = true;
     })
-
     recruiterMixer = new THREE.AnimationMixer(fbx);
     fbxLoader.load('models/recruiter/breathing_idle.fbx', (anim) => {
       recruiterIdle = recruiterMixer.clipAction(anim.animations[0]).play();
     })
-    recruiter.add(fbx);
-
     fbxLoader.load('models/recruiter/happy_walk.fbx', (anim) => {
       recruiterWalk = recruiterMixer.clipAction(anim.animations[0]);
     })
-    recruiter.add(fbx);
-
     fbxLoader.load('models/recruiter/happy_walk_backwards.fbx', (anim) => {
       recruiterWalkBackwards = recruiterMixer.clipAction(anim.animations[0]);
     })
-    recruiter.add(fbx);
-
     fbxLoader.load('models/recruiter/walk_left.fbx', (anim) => {
       recruiterWalkLeft = recruiterMixer.clipAction(anim.animations[0]);
     })
-    recruiter.add(fbx);
-
     fbxLoader.load('models/recruiter/walk_right.fbx', (anim) => {
       recruiterWalkRight = recruiterMixer.clipAction(anim.animations[0]);
     })
@@ -172,37 +164,29 @@ function init() {
   // developer
   developer = new THREE.Scene();
   fbxLoader.load('models/developer/rick_rigged_original.fbx', (fbx) => {
-
     fbx.position.set(290, 0, 70);
     fbx.scale.setScalar(1.3);
     fbx.traverse(c => {
       c.castShadow = true;
     })
-
     developerMixer = new THREE.AnimationMixer(fbx);
     fbxLoader.load('models/developer/drunk_idle.fbx', (anim) => {
-      developerIdle = developerMixer.clipAction(anim.animations[0])
-      developerIdle.play()
+      developerIdle = developerMixer.clipAction(anim.animations[0]).play()
     })
-    developer.add(fbx);
-
     fbxLoader.load('models/developer/drunk_walk.fbx', (anim) => {
       developerWalk = developerMixer.clipAction(anim.animations[0]);
     })
-    developer.add(fbx);
-
     fbxLoader.load('models/developer/drunk_walk_backwards.fbx', (anim) => {
       developerWalkBackwards = developerMixer.clipAction(anim.animations[0]);
     })
-    developer.add(fbx);
-
     fbxLoader.load('models/developer/left_walk.fbx', (anim) => {
       developerWalkLeft = developerMixer.clipAction(anim.animations[0]);
     })
-    developer.add(fbx);
-
     fbxLoader.load('models/developer/right_walk.fbx', (anim) => {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
+    })
+    fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
+      developerEndAnim = developerMixer.clipAction(anim.animations[0]);
     })
     developer.add(fbx);
   });
@@ -217,6 +201,35 @@ function init() {
     developerText.add(text)
   });
   scene.add(developerText);
+
+  // Angelo
+  angelo = new THREE.Scene();
+  fbxLoader.load('models/angelo/morty_original.fbx', (fbx) => {
+    fbx.position.set(0, 0, 350);
+    fbx.rotateY(9.3)
+    fbx.scale.setScalar(0.6);
+    fbx.traverse(c => {
+      c.castShadow = true;
+    })
+    angeloMixer = new THREE.AnimationMixer(fbx);
+    fbxLoader.load('models/angelo/sad_idle.fbx', (anim) => {
+      angeloIdle = angeloMixer.clipAction(anim.animations[0]).play();
+    })
+    fbxLoader.load('models/angelo/sad_idle_2.fbx', (anim) => {
+      angeloIdle2 = angeloMixer.clipAction(anim.animations[0]);
+    })
+    angelo.add(fbx);
+  });
+
+  //angelo Text
+  angeloText = new THREE.Scene();
+  textLoader.load(fontUrl, function (font) {
+    const geometry = creaGeometria('angelo', font, 30)
+    const text = new THREE.Mesh(geometry, textColor);
+    text.position.set(65, 200, 340)
+    text.rotateY(9.3)
+    angeloText.add(text)
+  });
 
   // Renderer
   renderer = new THREE.WebGLRenderer({antialias: true});
@@ -243,7 +256,6 @@ function init() {
       keys[key] = false;
 
   });
-
 }
 
 function creaGeometria(nome, font, size) {
@@ -264,7 +276,6 @@ function onMouseClick(event) {
   const developerIntersects = raycaster.intersectObjects(developer.children, true);
 
   if (recruiterIntersects.length > 0) {
-    console.log('hai cliccato su recruiter')
     removeEventsListener()
     document.getElementById('wyn').hidden = false;
     document.getElementById('inpR').hidden = false;
@@ -281,7 +292,6 @@ function onMouseClick(event) {
     activePlayerWalkLeft = recruiterWalkLeft;
     activePlayerWalkRight = recruiterWalkRight;
   } else if (developerIntersects.length > 0) {
-    console.log('hai cliccato su developer')
     removeEventsListener()
     document.getElementById('wyn').hidden = false;
     document.getElementById('inpD').hidden = false;
@@ -335,6 +345,7 @@ function animate() {
   const delta = clock.getDelta();
   if (recruiterMixer) recruiterMixer.update(delta);
   if (developerMixer) developerMixer.update(delta);
+  if (angeloMixer) angeloMixer.update(delta);
   if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector)
     if (keys.w || keys.arrowup) {
@@ -377,12 +388,71 @@ function animate() {
       activePlayerIdle.play()
       activePlayerWalkRight.stop()
     }
-    if (activePlayer && signed) {
-      // camera.lookAt(frontVector.x, frontVector.y+225, frontVector.z)
+    if (activePlayer.children[0].position.x > -150
+      && activePlayer.children[0].position.x < 150
+      && activePlayer.children[0].position.z > 190
+      && activePlayer.children[0].position.z < 350) {
+      if (chatTimer === undefined)
+        document.getElementById('clickSpace').hidden = false;
+      if (keys.space) {
+        chatHandler()
+      }
+    } else {
+      document.getElementById('clickSpace').hidden = true;
     }
   }
 
   render();
+}
+
+function chatHandler() {
+  if (chatTimer === undefined) {
+    angeloIdle2.play()
+    angeloIdle.stop()
+    chatIndex = 0;
+    chatTimer = Date.now() / 1000;
+    document.getElementById('chat').innerText = 'Angelo: Hi ' + user.name + '!';
+    document.getElementById('clickSpace').hidden = true;
+    document.getElementById('chat').hidden = false;
+  }
+  if ((Date.now() / 1000 - chatTimer) > 1) {
+    chatTimer = Date.now() / 1000;
+    if (chatIndex > 2) {
+      choose()
+      return
+    }
+    chatIndex++;
+    document.getElementById('chat').innerText = chatArray[chatIndex];
+  }
+}
+
+function choose() {
+  document.getElementById('choose').hidden = false;
+  document.getElementById('no').addEventListener('click', onMouseClick => {
+    document.getElementById('choose').hidden = true;
+    document.getElementById('chat').hidden = true;
+    chatTimer = undefined;
+  })
+  document.getElementById('yes').addEventListener('click', onMouseClick => {
+    document.getElementById('choose').hidden = true;
+    // document.getElementById('chat').innerText = 'Thank you!';
+
+    //DA ELIMINARE START
+    document.getElementById('chat').innerText = 'Something went wrong, come back in the next few days!';
+    setTimeout(function(){
+      document.getElementById('chat').hidden = true;
+      document.getElementById('clickSpace').hidden = true;
+      chatTimer = undefined;}, 2000)
+    //DA ELIMINARE FINE
+
+    // if (user.type === 'developer') {
+    //   setTimeout(function(){ window.location.replace("https://stackoverflow.com") }, 3000)
+    // } else if (user.type === 'recruiter') {
+    //   setTimeout(function(){ window.location.replace("https://stackoverflow.com") }, 3000)
+    // }
+  })
+
+
 }
 
 function onDocumentMouseMove(event) {
@@ -409,17 +479,16 @@ function signin() {
     user.type = 'developer'
     user.name = document.getElementById('inpDname').value;
     welcome(user)
-  }
-  else if (document.getElementById('inpRname').value) {
+  } else if (document.getElementById('inpRname').value) {
     user.type = 'recruiter'
     user.name = document.getElementById('inpRname').value;
     welcome(user)
   } else return;
   console.log(user)
-  document.getElementById('wyn').hidden=true;
-  document.getElementById('inpR').hidden=true;
-  document.getElementById('inpD').hidden=true;
-  signed=true;
+  document.getElementById('wyn').hidden = true;
+  document.getElementById('inpR').hidden = true;
+  document.getElementById('inpD').hidden = true;
+  signed = true;
   frontVector.z += 1
   activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
   camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
@@ -428,15 +497,16 @@ function signin() {
 function welcome(user) {
   let welcome = new THREE.Scene();
   textLoader.load(fontUrl, function (font) {
-    const geometry = creaGeometria('welcome '+user.name, font, 30)
+    const geometry = creaGeometria('welcome ' + user.name, font, 30)
     const text = new THREE.Mesh(geometry, textColor);
-    if (user.type==='developer')
-    text.position.set(-450, 300, 0)
+    if (user.type === 'developer')
+      text.position.set(-450, 300, 0)
     else
       text.position.set(100, 300, 0)
     welcome.add(text)
   });
   scene.add(welcome);
   welcome.rotateY(9.43)
-  main(fbxLoader, scene, angelo)
+  scene.add(angelo)
+  scene.add(angeloText)
 }
