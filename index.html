@@ -6,48 +6,53 @@
   <title>Angelo Lamonaca</title>
 </head>
 <body>
-<span class="text" id="wyn" hidden>what's your name?</span>
-<div class="textbox" id="inpD" hidden>
-  <div class="textbox-box">
-    <div class="textbox-face textbox-side"></div>
-    <div class="textbox-face textbox-bottom"></div>
-    <div class="textbox-face textbox-top"></div>
-    <div class="textbox-field">
-      <input class="textbox-text" id="inpDname" type="text" placeholder="TYPE HERE..."/>
-    </div>
-    <div class="textbox-action" id="signInDbutton">
+<div class="col text-center" id="loader" style="position: absolute; left: 40vw; top: 40vh">
+  <div id="fluid-meter-2"></div>
+</div>
+<div id="container" hidden>
+  <span class="text" id="wyn" hidden>what's your name?</span>
+  <div class="textbox" id="inpD" hidden>
+    <div class="textbox-box">
       <div class="textbox-face textbox-side"></div>
-      <div class="textbox-face textbox-top"></div>
       <div class="textbox-face textbox-bottom"></div>
-      <svg viewBox="0 0 24 24">
-        <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-      </svg>
+      <div class="textbox-face textbox-top"></div>
+      <div class="textbox-field">
+        <input class="textbox-text" id="inpDname" type="text" placeholder="TYPE HERE..."/>
+      </div>
+      <div class="textbox-action" id="signInDbutton">
+        <div class="textbox-face textbox-side"></div>
+        <div class="textbox-face textbox-top"></div>
+        <div class="textbox-face textbox-bottom"></div>
+        <svg viewBox="0 0 24 24">
+          <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+      </div>
     </div>
   </div>
-</div>
-<div class="textbox" id="inpR" hidden>
-  <div class="textbox-box">
-    <div class="textbox-face textbox-side"></div>
-    <div class="textbox-face textbox-bottom"></div>
-    <div class="textbox-face textbox-top"></div>
-    <div class="textbox-field">
-      <input class="textbox-text" id="inpRname" type="text" placeholder="TYPE HERE..."/>
-    </div>
-    <div class="textbox-action" id="signInRbutton">
+  <div class="textbox" id="inpR" hidden>
+    <div class="textbox-box">
       <div class="textbox-face textbox-side"></div>
-      <div class="textbox-face textbox-top"></div>
       <div class="textbox-face textbox-bottom"></div>
-      <svg viewBox="0 0 24 24">
-        <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-      </svg>
+      <div class="textbox-face textbox-top"></div>
+      <div class="textbox-field">
+        <input class="textbox-text" id="inpRname" type="text" placeholder="TYPE HERE..."/>
+      </div>
+      <div class="textbox-action" id="signInRbutton">
+        <div class="textbox-face textbox-side"></div>
+        <div class="textbox-face textbox-top"></div>
+        <div class="textbox-face textbox-bottom"></div>
+        <svg viewBox="0 0 24 24">
+          <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+      </div>
     </div>
   </div>
-</div>
-<span class="text" id="clickSpace" hidden>press space to talk with angelo</span>
-<div class="box" id="chat" hidden><i></i></div>
-<div id="choose" hidden>
-  <img src="src/img/yes.png" id="yes">
-  <img src="src/img/no.png" id="no">
+  <span class="text" id="clickSpace" hidden>press space to talk with angelo</span>
+  <div class="box" id="chat" hidden><i></i></div>
+  <div id="choose" hidden>
+    <img src="src/img/yes.png" id="yes">
+    <img src="src/img/no.png" id="no">
+  </div>
 </div>
 <script type="text/javascript" src="./src/mythree.js"></script>
 </body>

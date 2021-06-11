@@ -5,6 +5,7 @@ import {DRACOLoader} from "three/examples/jsm/loaders/DRACOLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {follow} from "./follow";
 import {Vector3} from "three";
+import {update} from './bubbleprogress';
 
 let camera, scene, renderer;
 const clock = new THREE.Clock();
@@ -61,7 +62,7 @@ animate();
 function init() {
 
   // Container
-  const container = document.createElement('div');
+  const container = document.getElementById('container');
   document.body.appendChild(container);
 
   // Camera
@@ -82,13 +83,16 @@ function init() {
     console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
   };
   manager.onLoad = function () {
-    console.log('Loading complete!');
+    document.getElementById('container').hidden=false;
+    document.getElementById('loader').hidden=true;
   };
   manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+
+    update(itemsLoaded/itemsTotal*100);
     console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
   };
   manager.onError = function (url) {
-    console.log('There was an error loading ' + url);
+    alert('There was an error loading ' + url);
   };
 
   gltfLoader = new GLTFLoader(manager);
@@ -108,7 +112,6 @@ function init() {
     whoareyou.add(text)
   });
   scene.add(whoareyou);
-
 
   ambiente = new THREE.Scene();
   gltfLoader.load('models/cyberpunk-office/source/CyberpunkOffice.glb', function (object) {
