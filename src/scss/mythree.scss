@@ -3,6 +3,37 @@ body {
   background-color: black;
 }
 
+#arrowkeys {
+  position: absolute;
+  bottom: 2vh;
+  left: 40vw;
+  & img {
+
+    animation: pulse 3s linear infinite;
+    width: 20vw;
+
+    -webkit-filter: drop-shadow(1px 1px 0 #ffffff)
+    drop-shadow(-1px -1px 0 #ffffff);
+    filter: drop-shadow(1px 1px 0 #ffffff)
+    drop-shadow(-1px -1px 0 #ffffff);
+  }
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
 #yes {
   position: absolute;
   top: 30vh;

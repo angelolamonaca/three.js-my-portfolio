@@ -79,21 +79,6 @@ function init() {
     loadingScreen.addEventListener('transitionend', onTransitionEnd);
 
   });
-  manager.onStart = function (url, itemsLoaded, itemsTotal) {
-    console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-  };
-  manager.onLoad = function () {
-    document.getElementById('container').hidden=false;
-    document.getElementById('loader').hidden=true;
-  };
-  manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-
-    update(itemsLoaded/itemsTotal*100);
-    console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-  };
-  manager.onError = function (url) {
-    alert('There was an error loading ' + url);
-  };
 
   gltfLoader = new GLTFLoader(manager);
   dracoLoader = new DRACOLoader(manager);
@@ -168,7 +153,7 @@ function init() {
   developer = new THREE.Scene();
   fbxLoader.load('models/developer/rick_rigged_original.fbx', (fbx) => {
     fbx.position.set(290, 0, 70);
-    fbx.scale.setScalar(1.3);
+    fbx.scale.setScalar(0.7);
     fbx.traverse(c => {
       c.castShadow = true;
     })
@@ -188,9 +173,9 @@ function init() {
     fbxLoader.load('models/developer/right_walk.fbx', (anim) => {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
     })
-    fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
-      developerEndAnim = developerMixer.clipAction(anim.animations[0]);
-    })
+    // fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
+    //   developerEndAnim = developerMixer.clipAction(anim.animations[0]);
+    // })
     developer.add(fbx);
   });
   scene.add(developer);
@@ -243,9 +228,7 @@ function init() {
   renderer.render(scene, camera);
 
   // EventListeners
-  document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
-  document.addEventListener('mousemove', onDocumentMouseMove);
   document.getElementById("signInDbutton").addEventListener("click", signin, false);
   document.getElementById("signInRbutton").addEventListener("click", signin, false);
   document.body.addEventListener('keydown', function (e) {
@@ -259,6 +242,23 @@ function init() {
       keys[key] = false;
 
   });
+
+  manager.onStart = function (url, itemsLoaded, itemsTotal) {
+    console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+  };
+  manager.onLoad = function () {
+    document.getElementById('container').hidden=false;
+    document.getElementById('loader').hidden=true;
+  };
+  manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+
+    update(itemsLoaded/itemsTotal*100);
+    console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+  };
+  manager.onError = function (url) {
+    alert('There was an error loading ' + url);
+  };
+
 }
 
 function creaGeometria(nome, font, size) {
@@ -313,13 +313,12 @@ function onMouseClick(event) {
   }
 
   function removeEventsListener() {
-    document.removeEventListener('click', onMouseClick, false);
     document.removeEventListener('mousemove', onMouseMove, false);
-    document.removeEventListener('mousemove', onDocumentMouseMove);
   }
 }
 
 function onMouseMove(event) {
+  mouseX = (event.clientX - windowHalfX) / 2;
   mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
   mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
@@ -327,7 +326,10 @@ function onMouseMove(event) {
   // Rilevazione intersezione mouse/recruiter
   const recruiterIntersects = raycaster.intersectObjects(recruiter.children, true);
   const developerIntersects = raycaster.intersectObjects(developer.children, true);
-
+  if (recruiterIntersects.length > 0 || developerIntersects.length > 0)
+    document.addEventListener('click', onMouseClick, false);
+  else
+    document.removeEventListener('click', onMouseClick, false);
   if (recruiterIntersects.length > 0 && recruiterHover === false) {
     recruiterHover = true
     recruiterText.translateY(25);
@@ -352,6 +354,7 @@ function animate() {
   if (activePlayer && signed) {
     activePlayer.children[0].lookAt(frontVector)
     if (keys.w || keys.arrowup) {
+      document.getElementById("arrowkeys").hidden=true
       frontVector.z += 1
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100)
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400)
@@ -458,10 +461,6 @@ function choose() {
 
 }
 
-function onDocumentMouseMove(event) {
-  mouseX = (event.clientX - windowHalfX) / 2;
-}
-
 function render() {
   renderer.render(scene, camera);
 
@@ -512,4 +511,5 @@ function welcome(user) {
   welcome.rotateY(9.43)
   scene.add(angelo)
   scene.add(angeloText)
+  document.getElementById("arrowkeys").hidden=false
 }

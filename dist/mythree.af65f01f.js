@@ -46167,25 +46167,6 @@ function init() {
 
     loadingScreen.addEventListener('transitionend', onTransitionEnd);
   });
-
-  manager.onStart = function (url, itemsLoaded, itemsTotal) {
-    console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-  };
-
-  manager.onLoad = function () {
-    document.getElementById('container').hidden = false;
-    document.getElementById('loader').hidden = true;
-  };
-
-  manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    (0, _bubbleprogress.update)(itemsLoaded / itemsTotal * 100);
-    console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-  };
-
-  manager.onError = function (url) {
-    alert('There was an error loading ' + url);
-  };
-
   gltfLoader = new _GLTFLoader.GLTFLoader(manager);
   dracoLoader = new _DRACOLoader.DRACOLoader(manager);
   fbxLoader = new _FBXLoader.FBXLoader(manager);
@@ -46252,7 +46233,7 @@ function init() {
   developer = new THREE.Scene();
   fbxLoader.load('models/developer/rick_rigged_original.fbx', function (fbx) {
     fbx.position.set(290, 0, 70);
-    fbx.scale.setScalar(1.3);
+    fbx.scale.setScalar(0.7);
     fbx.traverse(function (c) {
       c.castShadow = true;
     });
@@ -46271,10 +46252,10 @@ function init() {
     });
     fbxLoader.load('models/developer/right_walk.fbx', function (anim) {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
-    });
-    fbxLoader.load('models/developer/gunplay.fbx', function (anim) {
-      developerEndAnim = developerMixer.clipAction(anim.animations[0]);
-    });
+    }); // fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
+    //   developerEndAnim = developerMixer.clipAction(anim.animations[0]);
+    // })
+
     developer.add(fbx);
   });
   scene.add(developer); // Developer Text
@@ -46324,9 +46305,7 @@ function init() {
   container.appendChild(renderer.domElement);
   renderer.render(scene, camera); // EventListeners
 
-  document.addEventListener('click', onMouseClick, false);
   document.addEventListener('mousemove', onMouseMove, false);
-  document.addEventListener('mousemove', onDocumentMouseMove);
   document.getElementById("signInDbutton").addEventListener("click", signin, false);
   document.getElementById("signInRbutton").addEventListener("click", signin, false);
   document.body.addEventListener('keydown', function (e) {
@@ -46337,6 +46316,24 @@ function init() {
     var key = e.code.replace('Key', '').toLowerCase();
     if (keys[key] !== undefined) keys[key] = false;
   });
+
+  manager.onStart = function (url, itemsLoaded, itemsTotal) {
+    console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+  };
+
+  manager.onLoad = function () {
+    document.getElementById('container').hidden = false;
+    document.getElementById('loader').hidden = true;
+  };
+
+  manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+    (0, _bubbleprogress.update)(itemsLoaded / itemsTotal * 100);
+    console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+  };
+
+  manager.onError = function (url) {
+    alert('There was an error loading ' + url);
+  };
 }
 
 function creaGeometria(nome, font, size) {
@@ -46390,19 +46387,19 @@ function onMouseClick(event) {
   }
 
   function removeEventsListener() {
-    document.removeEventListener('click', onMouseClick, false);
     document.removeEventListener('mousemove', onMouseMove, false);
-    document.removeEventListener('mousemove', onDocumentMouseMove);
   }
 }
 
 function onMouseMove(event) {
+  mouseX = (event.clientX - windowHalfX) / 2;
   mouse.x = event.clientX / renderer.domElement.clientWidth * 2 - 1;
   mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera); // Rilevazione intersezione mouse/recruiter
 
   var recruiterIntersects = raycaster.intersectObjects(recruiter.children, true);
   var developerIntersects = raycaster.intersectObjects(developer.children, true);
+  if (recruiterIntersects.length > 0 || developerIntersects.length > 0) document.addEventListener('click', onMouseClick, false);else document.removeEventListener('click', onMouseClick, false);
 
   if (recruiterIntersects.length > 0 && recruiterHover === false) {
     recruiterHover = true;
@@ -46430,6 +46427,7 @@ function animate() {
     activePlayer.children[0].lookAt(frontVector);
 
     if (keys.w || keys.arrowup) {
+      document.getElementById("arrowkeys").hidden = true;
       frontVector.z += 1;
       activePlayer.children[0].position.set(frontVector.x, frontVector.y, frontVector.z - 100);
       camera.position.set(frontVector.x, frontVector.y + 225, frontVector.z - 400);
@@ -46536,10 +46534,6 @@ function choose() {
   });
 }
 
-function onDocumentMouseMove(event) {
-  mouseX = (event.clientX - windowHalfX) / 2;
-}
-
 function render() {
   renderer.render(scene, camera);
   if (!signed) camera.position.x += (mouseX - camera.position.x) * .01;
@@ -46582,6 +46576,7 @@ function welcome(user) {
   welcome.rotateY(9.43);
   scene.add(angelo);
   scene.add(angeloText);
+  document.getElementById("arrowkeys").hidden = false;
 }
 },{"three":"node_modules/three/build/three.module.js","./space/light":"src/space/light.js","three/examples/jsm/loaders/GLTFLoader":"node_modules/three/examples/jsm/loaders/GLTFLoader.js","three/examples/jsm/loaders/DRACOLoader":"node_modules/three/examples/jsm/loaders/DRACOLoader.js","three/examples/jsm/loaders/FBXLoader":"node_modules/three/examples/jsm/loaders/FBXLoader.js","./follow":"src/follow.js","./bubbleprogress":"src/bubbleprogress.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -46611,7 +46606,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57544" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52341" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
