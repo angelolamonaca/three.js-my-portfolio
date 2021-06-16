@@ -102,7 +102,7 @@ body {
 .textbox#inpD {
   top: 50vh;
   right: 15vw;
-  width: 40vw;
+  width: 35vw;
   height: 15vh;
   position: absolute;
   transform-style: preserve-3d;
@@ -113,7 +113,7 @@ body {
 .textbox#inpR {
   top: 50vh;
   left: 20vw;
-  width: 40vw;
+  width: 35vw;
   height: 15vh;
   position: absolute;
   transform-style: preserve-3d;
@@ -187,7 +187,7 @@ body {
   height: 100%;
   border: none;
   background-color: transparent;
-  font: 4vw sans-serif;
+  font: 3vw sans-serif;
   -webkit-animation: hover 2s -0.4s alternate infinite;
   animation: hover 2s -0.4s alternate infinite;
   display: block;
