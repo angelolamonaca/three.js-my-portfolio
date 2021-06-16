@@ -13,13 +13,14 @@ let gltfLoader, dracoLoader, fbxLoader;
 let recruiter, recruiterMixer, recruiterIdle, recruiterWalk, recruiterWalkBackwards, recruiterWalkLeft,
   recruiterWalkRight, recruiterHover = false;
 let developer, developerMixer, developerIdle, developerWalk, developerWalkBackwards, developerWalkLeft,
-  developerWalkRight, developerEndAnim, developerHover = false;
+  developerWalkRight, developerHover = false;
 let activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft,
   activePlayerWalkRight;
-let angelo, angeloMixer, angeloIdle, angeloIdle2, angeloIdle3, angeloText;
+let angelo, angeloMixer, angeloIdle, angeloIdle2, angeloEndAnim, angeloText;
 let ambiente;
 let chatTimer, chatIndex;
-let chatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
+let recruiterChatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
+let developerChatArray = ['Hi ', 'Angelo: It is a pleasure to have an adventure companion in my world!', 'Angelo: I created this world in ThreeJS, a very funny js library', 'Angelo: I haven\'t completed the developer experience yet, but you can try the recruiter experience by reloading the page'];
 
 let signed;
 let frontVector = new Vector3();
@@ -173,9 +174,6 @@ function init() {
     fbxLoader.load('models/developer/right_walk.fbx', (anim) => {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
     })
-    // fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
-    //   developerEndAnim = developerMixer.clipAction(anim.animations[0]);
-    // })
     developer.add(fbx);
   });
   scene.add(developer);
@@ -205,6 +203,9 @@ function init() {
     })
     fbxLoader.load('models/angelo/sad_idle_2.fbx', (anim) => {
       angeloIdle2 = angeloMixer.clipAction(anim.animations[0]);
+    })
+    fbxLoader.load('models/angelo/breakdance_freezes.fbx', (anim) => {
+      angeloEndAnim = angeloMixer.clipAction(anim.animations[0]);
     })
     angelo.add(fbx);
   });
@@ -413,7 +414,9 @@ function animate() {
 
 function chatHandler() {
   if (chatTimer === undefined) {
-    angeloIdle2.play()
+    if (user.type==='developer') {
+      angeloEndAnim.play();
+    } else angeloIdle2.play();
     angeloIdle.stop()
     chatIndex = 0;
     chatTimer = Date.now() / 1000;
@@ -428,7 +431,8 @@ function chatHandler() {
       return
     }
     chatIndex++;
-    document.getElementById('chat').innerText = chatArray[chatIndex];
+    if (user.type==='recruiter') document.getElementById('chat').innerText = recruiterChatArray[chatIndex];
+    else document.getElementById('chat').innerText = developerChatArray[chatIndex];
   }
 }
 
@@ -443,12 +447,13 @@ function choose() {
     document.getElementById('choose').hidden = true;
     // document.getElementById('chat').innerText = 'Thank you!';
 
-    //DA ELIMINARE START
-    document.getElementById('chat').innerText = 'Something went wrong, come back in the next few days!';
-    setTimeout(function(){
-      document.getElementById('chat').hidden = true;
-      document.getElementById('clickSpace').hidden = true;
-      chatTimer = undefined;}, 2000)
+    document.getElementById('chat').innerText = 'Angelo: Thank you! Hold on tight, we will go very fast!';
+    if (user.type === 'recruiter') setTimeout(function(){
+      window.location.replace("https://stackoverflow.com")
+    }, 2000)
+    else if (user.type === 'developer') setTimeout(function(){
+      window.location.reload()
+    }, 2000)
     //DA ELIMINARE FINE
 
     // if (user.type === 'developer') {

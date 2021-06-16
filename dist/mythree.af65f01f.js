@@ -46114,13 +46114,13 @@ var developer,
     developerWalkBackwards,
     developerWalkLeft,
     developerWalkRight,
-    developerEndAnim,
     developerHover = false;
 var activePlayer, activePlayerIdle, activePlayerWalk, activePlayerWalkBackwards, activePlayerWalkLeft, activePlayerWalkRight;
-var angelo, angeloMixer, angeloIdle, angeloIdle2, angeloIdle3, angeloText;
+var angelo, angeloMixer, angeloIdle, angeloIdle2, angeloEndAnim, angeloText;
 var ambiente;
 var chatTimer, chatIndex;
-var chatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
+var recruiterChatArray = ['Hi ', 'Angelo: I am happy that you are here!', 'Angelo: I lost my memory, I don\'t remember who I am', 'Angelo: Can you help me recover my memory?'];
+var developerChatArray = ['Hi ', 'Angelo: It is a pleasure to have an adventure companion in my world!', 'Angelo: I created this world in ThreeJS, a very funny js library', 'Angelo: I haven\'t completed the developer experience yet, but you can try the recruiter experience by reloading the page'];
 var signed;
 var frontVector = new THREE.Vector3();
 var user = {
@@ -46252,10 +46252,7 @@ function init() {
     });
     fbxLoader.load('models/developer/right_walk.fbx', function (anim) {
       developerWalkRight = developerMixer.clipAction(anim.animations[0]);
-    }); // fbxLoader.load('models/developer/gunplay.fbx', (anim) => {
-    //   developerEndAnim = developerMixer.clipAction(anim.animations[0]);
-    // })
-
+    });
     developer.add(fbx);
   });
   scene.add(developer); // Developer Text
@@ -46283,6 +46280,9 @@ function init() {
     });
     fbxLoader.load('models/angelo/sad_idle_2.fbx', function (anim) {
       angeloIdle2 = angeloMixer.clipAction(anim.animations[0]);
+    });
+    fbxLoader.load('models/angelo/breakdance_freezes.fbx', function (anim) {
+      angeloEndAnim = angeloMixer.clipAction(anim.animations[0]);
     });
     angelo.add(fbx);
   }); //angelo Text
@@ -46487,7 +46487,10 @@ function animate() {
 
 function chatHandler() {
   if (chatTimer === undefined) {
-    angeloIdle2.play();
+    if (user.type === 'developer') {
+      angeloEndAnim.play();
+    } else angeloIdle2.play();
+
     angeloIdle.stop();
     chatIndex = 0;
     chatTimer = Date.now() / 1000;
@@ -46505,7 +46508,7 @@ function chatHandler() {
     }
 
     chatIndex++;
-    document.getElementById('chat').innerText = chatArray[chatIndex];
+    if (user.type === 'recruiter') document.getElementById('chat').innerText = recruiterChatArray[chatIndex];else document.getElementById('chat').innerText = developerChatArray[chatIndex];
   }
 }
 
@@ -46518,13 +46521,12 @@ function choose() {
   });
   document.getElementById('yes').addEventListener('click', function (onMouseClick) {
     document.getElementById('choose').hidden = true; // document.getElementById('chat').innerText = 'Thank you!';
-    //DA ELIMINARE START
 
-    document.getElementById('chat').innerText = 'Something went wrong, come back in the next few days!';
-    setTimeout(function () {
-      document.getElementById('chat').hidden = true;
-      document.getElementById('clickSpace').hidden = true;
-      chatTimer = undefined;
+    document.getElementById('chat').innerText = 'Angelo: Thank you! Hold on tight, we will go very fast!';
+    if (user.type === 'recruiter') setTimeout(function () {
+      window.location.replace("https://stackoverflow.com");
+    }, 2000);else if (user.type === 'developer') setTimeout(function () {
+      window.location.reload();
     }, 2000); //DA ELIMINARE FINE
     // if (user.type === 'developer') {
     //   setTimeout(function(){ window.location.replace("https://stackoverflow.com") }, 3000)
@@ -46606,7 +46608,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52341" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56934" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
